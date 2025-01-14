@@ -1,3 +1,4 @@
+from data.books import save_books_to_file
 from models.book import Book
 from models.book_decorator import BookDecorator
 from models.search_strategy import SearchManager, SearchByName, SearchByAuthor, SearchByCategory, SearchByYear
@@ -53,7 +54,7 @@ class LibraryManager:
 
     def borrow_book(self, book_id: int) -> bool:
         """
-        Borrows a book and updates its borrow count.
+        Borrows the first available copy of a book.
 
         Args:
             book_id (int): The ID of the book to borrow.
@@ -62,12 +63,16 @@ class LibraryManager:
             bool: True if the book was successfully borrowed, False otherwise.
         """
         for book in self.books:
-            if book.id == book_id and book.is_available():
-                book.update_copies(-1)
-                self.decorators[book_id].increase_borrow_count()  # Track borrow count
-                print(f"Book '{book.title}' borrowed successfully.")
-                return True
-        print("Book is not available for borrowing.")
+            if book.id == book_id and book.has_available_copies():
+                for copy_id, status in book.is_loaned.items():
+                    if status == "no":
+                        book.is_loaned[copy_id] = "yes"
+                        book.available -= 1
+                        book.borrow_count += 1
+                        save_books_to_file(self.books, "books_working_copy.csv")
+                        print(f"Borrowed copy {copy_id} of book '{book.title}'.")
+                        return True
+        print("No available copies to borrow.")
         return False
 
     def return_book(self, book_id: int) -> bool:
@@ -139,4 +144,10 @@ class LibraryManager:
         else:
             raise ValueError(f"Unknown search strategy: {strategy}")
 
-
+    def show_available_books(self):
+        """
+        Displays all books with their available copies.
+        """
+        print("Available books:")
+        for book in self.books:
+            print(f"{book.title} - Available copies: {book.available}")
