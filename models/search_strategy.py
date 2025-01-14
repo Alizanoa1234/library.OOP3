@@ -25,6 +25,15 @@ class SearchByCategory(SearchStrategy):
     def search(self, books, criteria):
         return [book for book in books if criteria.lower() in book.category.lower()]
 
+class SearchByYear(SearchStrategy):
+    def search(self, books, criteria):
+        return [book for book in books if book.year == int(criteria)]
+
+class SearchByID(SearchStrategy):
+    def search(self, books, criteria):
+        return [book for book in books if book.id == int(criteria)]
+
+
 # Manager class for handling different search strategies
 class SearchManager:
     # Initializes the manager with a specific search strategy
