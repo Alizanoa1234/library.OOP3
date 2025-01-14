@@ -1,6 +1,6 @@
 from models.book import Book
 from models.book_decorator import BookDecorator
-from models.search_strategy import SearchManager, SearchByName, SearchByAuthor, SearchByCategory
+from models.search_strategy import SearchManager, SearchByName, SearchByAuthor, SearchByCategory, SearchByYear
 
 
 class LibraryManager:
@@ -112,6 +112,31 @@ class LibraryManager:
         Args:
             query (str): The search query.
             search_by (str): The search type (title, author, or category).
+
+        Returns:
+            list: A list of books matching the search query.
         """
         if search_by == "title":
-            s
+            self.search_manager.set_strategy(SearchByName())
+        elif search_by == "author":
+            self.search_manager.set_strategy(SearchByAuthor())
+        elif search_by == "category":
+            self.search_manager.set_strategy(SearchByCategory())
+        elif search_by == "year":
+            self.search_manager.set_strategy(SearchByYear())
+        else:
+            raise ValueError(f"Invalid search type: {search_by}")
+
+        return self.search_manager.search(self.books, query)
+
+    def set_search_strategy(self, strategy: str):
+        if strategy == "title":
+            self.search_manager.set_strategy(SearchByName())
+        elif strategy == "author":
+            self.search_manager.set_strategy(SearchByAuthor())
+        elif strategy == "category":
+            self.search_manager.set_strategy(SearchByCategory())
+        else:
+            raise ValueError(f"Unknown search strategy: {strategy}")
+
+

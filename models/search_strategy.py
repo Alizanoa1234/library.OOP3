@@ -34,6 +34,8 @@ class SearchByID(SearchStrategy):
         return [book for book in books if book.id == int(criteria)]
 
 
+
+
 # Manager class for handling different search strategies
 class SearchManager:
     # Initializes the manager with a specific search strategy
