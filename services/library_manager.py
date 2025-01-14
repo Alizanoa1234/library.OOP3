@@ -88,12 +88,12 @@ class LibraryManager:
         print(f"Book with ID {book_id} not found.")
         return False
 
-    def get_popular_books(self, top_n: int = 5) -> list:
+    def get_popular_books(self, top_n: int = 10) -> list:
         """
         Returns the top N most popular books based on borrow count.
 
         Args:
-            top_n (int): The number of top books to return. Default is 5.
+            top_n (int): The number of top books to return. Default is 10.
 
         Returns:
             list: A list of the most popular books, sorted by borrow count.
