@@ -77,3 +77,4 @@ def __lt__(self, other: object) -> bool:
     if not isinstance(other, Book):
         return NotImplemented
     return self.year < other.year
+
