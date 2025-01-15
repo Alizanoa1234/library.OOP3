@@ -3,6 +3,8 @@ from models.book import Book
 from models.book_decorator import BookDecorator
 from models.search_strategy import SearchManager, SearchByName, SearchByAuthor, SearchByCategory, SearchByYear
 from services.observer import Subscriber, ObserverManager
+from utils.logger import log_info, log_error
+
 
 
 
@@ -93,7 +95,10 @@ class LibraryManager:
                         print(f"Borrowed copy {copy_id} of book '{book.title}'.")
                         return True
         print("No available copies to borrow.")
+        log_error(f"Failed to borrow book with ID {book_id}. No copies available or invalid ID.")
+
         return False
+
 
     def return_book(self, book_id: int) -> bool:
         """
@@ -110,8 +115,10 @@ class LibraryManager:
                 book.update_copies(1)
                 print(f"Book '{book.title}' returned successfully.")
                 self.observer_manager.notify_librarians(book_id, book.title)
+                log_info(f"Book '{book.title}' (ID: {book_id}) returned successfully.")
                 return True
         print(f"Book with ID {book_id} not found.")
+        log_error(f"Failed to return book with ID {book_id}. Book not found.")
         return False
 
     def get_popular_books(self, top_n: int = 10) -> list:
