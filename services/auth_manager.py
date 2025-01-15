@@ -26,6 +26,14 @@ class AuthManager:
 
     # Registers a new librarian
     def register_librarian(self, username: str, password: str) -> bool:
+        if len(password) < 6:
+            print("Password must be at least 6 characters long.")
+            return False
+
+        if not username.isalnum():
+            print("Username can only contain letters and numbers.")
+            return False
+
         if username in self.librarians:
             print(f"Username '{username}' already exists.")
             return False

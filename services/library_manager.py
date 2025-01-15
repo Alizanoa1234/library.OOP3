@@ -84,6 +84,10 @@ class LibraryManager:
         Returns:
             bool: True if the book was successfully borrowed, False otherwise.
         """
+        if not any(book.id == book_id for book in self.books):
+            print(f"Invalid book ID. Available books: {[book.id for book in self.books]}")
+            return False
+
         for book in self.books:
             if book.id == book_id and book.has_available_copies():
                 for copy_id, status in book.is_loaned.items():
@@ -110,6 +114,10 @@ class LibraryManager:
         Returns:
             bool: True if the book was successfully returned, False otherwise.
         """
+        if not any(book.id == book_id for book in self.books):
+            print(f"Invalid book ID. Available books: {[book.id for book in self.books]}")
+            return False
+
         for book in self.books:
             if book.id == book_id:
                 book.update_copies(1)

@@ -1,67 +1,86 @@
-from models.book import Book
-from services.observer import Subscriber, ObserverManager
+import os
 from services.library_manager import LibraryManager
+from services.auth_manager import AuthManager
+from utils.file_manager import load_books_from_file, save_books_to_file
+from models.book import Book
 
+
+def get_file_path(prompt, default):
+    """
+    Prompts the user for a file path or uses a default value.
+    """
+    file_path = input(f"{prompt} (default: {default}): ").strip()
+    return file_path if file_path else default
 
 def main():
+    # Get file paths
+    books_file_path = get_file_path("Enter path to books CSV", "data/books.csv")
+    users_file_path = get_file_path("Enter path to users CSV", "data/users.csv")
+
+    # Initialize managers
     library_manager = LibraryManager()
+    auth_manager = AuthManager(users_file_path)
 
-    # Sample books
-    book1 = Book(1, "Clean Code", "Robert C. Martin", "Programming", 2008, 2)
-    book2 = Book(2, "The Pragmatic Programmer", "Andy Hunt", "Programming", 1999, 1)
-
-    # Add sample books to the library
-    library_manager.add_book(book1)
-    library_manager.add_book(book2)
+    # Load initial books
+    library_manager.books = load_books_from_file(books_file_path)
 
     while True:
-        print("\n--- Library System Menu ---")
-        print("1. Add subscriber to waitlist")
-        print("2. Remove subscriber from waitlist")
-        print("3. Borrow a book")
-        print("4. Return a book")
-        print("5. Show available books")
-        print("6. Exit")
+        print("""
+--- Library System Menu ---
+1. Register Librarian
+2. Login Librarian
+3. Add Book
+4. Borrow Book
+5. Return Book
+6. Show Available Books
+7. Exit
+""")
+        choice = input("Enter your choice: ").strip()
 
-        choice = input("Enter your choice (1-6): ").strip()
+        if choice == "1":  # Register librarian
+            username = input("Enter librarian username: ").strip()
+            password = input("Enter librarian password: ").strip()
+            auth_manager.register_librarian(username, password)
 
-        if choice == "1":
-            book_id = int(input("Enter book ID to subscribe: "))
-            librarian_name = input("Enter librarian's name: ")
-            librarian_email = input("Enter librarian's email: ")
-            library_manager.add_subscriber_to_book(book_id, librarian_name, librarian_email)
+        elif choice == "2":  # Login
+            username = input("Enter librarian username: ").strip()
+            password = input("Enter librarian password: ").strip()
+            auth_manager.login(username, password)
 
-        elif choice == "2":
-            book_id = int(input("Enter book ID to remove subscriber: "))
-            librarian_email = input("Enter librarian's email to remove: ")
-            library_manager.remove_subscriber_from_book(book_id, librarian_email)
+        elif choice == "3":  # Add book
+            try:
+                book_id = int(input("Enter book ID: "))
+                title = input("Enter title: ")
+                author = input("Enter author: ")
+                category = input("Enter category: ")
+                year = int(input("Enter year: "))
+                copies = int(input("Enter number of copies: "))
+                book = Book(book_id, title, author, category, year, copies)
+                library_manager.add_book(book)
+                save_books_to_file(library_manager.books, books_file_path)
+            except ValueError:
+                print("Invalid input. Please enter valid details.")
 
-        elif choice == "3":
-            book_id = int(input("Enter book ID to borrow: "))
-            success = library_manager.borrow_book(book_id)
-            if success:
-                print("Borrowed successfully!")
-            else:
-                print("Borrowing failed. No copies available or invalid book ID.")
+        elif choice == "4":  # Borrow book
+            try:
+                book_id = int(input("Enter book ID to borrow: "))
+                library_manager.borrow_book(book_id)
+            except ValueError:
+                print("Invalid book ID.")
 
-        elif choice == "4":
-            book_id = int(input("Enter book ID to return: "))
-            success = library_manager.return_book(book_id)
-            if success:
-                print("Returned successfully!")
-            else:
-                print("Returning failed. Invalid book ID.")
+        elif choice == "5":  # Return book
+            try:
+                book_id = int(input("Enter book ID to return: "))
+                library_manager.return_book(book_id)
+            except ValueError:
+                print("Invalid book ID.")
 
-        elif choice == "5":
+        elif choice == "6":  # Show available books
             library_manager.show_available_books()
 
-        elif choice == "6":
-            print("Exiting the system. Goodbye!")
+        elif choice == "7":  # Exit
+            print("Goodbye!")
             break
 
         else:
-            print("Invalid choice. Please enter a number between 1 and 6.")
-
-
-if __name__ == "__main__":
-    main()
+            print("Invalid choice. Please enter a valid option.")
