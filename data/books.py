@@ -8,6 +8,7 @@ def load_books_from_file(file_path: str) -> list:
     Args:
         file_path (str): Path to the original file.
 
+
     Returns:
         list: List of Book objects with dynamic is_loaned fields.
     """
