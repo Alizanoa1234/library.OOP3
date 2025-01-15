@@ -2,6 +2,8 @@ from data.books import save_books_to_file
 from models.book import Book
 from models.book_decorator import BookDecorator
 from models.search_strategy import SearchManager, SearchByName, SearchByAuthor, SearchByCategory, SearchByYear
+from services.observer import Subscriber, ObserverManager
+
 
 
 class LibraryManager:
@@ -16,6 +18,8 @@ class LibraryManager:
         self.books = []  # List of books
         self.decorators = {}  # Maps book ID to its decorated version
         self.search_manager = SearchManager(SearchByName())  # Default search strategy is by title
+        self.observer_manager = ObserverManager()
+
 
     def add_book(self, book: Book):
         """
@@ -51,6 +55,22 @@ class LibraryManager:
                 return True
         print(f"Book with ID {book_id} not found.")
         return False
+
+    def add_subscriber_to_book(self, book_id: int, librarian_name: str, librarian_email: str):
+        """
+        Adds a librarian to the notification list for a book.
+        """
+        subscriber = Subscriber(librarian_name, librarian_email)
+        self.observer_manager.add_subscriber(book_id, subscriber)
+
+    def remove_subscriber_from_book(self, book_id: int, librarian_email: str):
+        """
+        Removes a librarian from the waitlist for a specific book.
+        Args:
+            book_id (int): The ID of the book.
+            librarian_email (str): The librarian's email.
+        """
+        self.observer_manager.remove_subscriber(book_id, librarian_email)
 
     def borrow_book(self, book_id: int) -> bool:
         """
@@ -89,6 +109,7 @@ class LibraryManager:
             if book.id == book_id:
                 book.update_copies(1)
                 print(f"Book '{book.title}' returned successfully.")
+                self.observer_manager.notify_librarians(book_id, book.title)
                 return True
         print(f"Book with ID {book_id} not found.")
         return False
