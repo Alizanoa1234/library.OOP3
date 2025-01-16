@@ -3,14 +3,14 @@ from models.book import Book
 
 def load_books_from_file(file_path: str) -> list:
     """
-    Loads books from the original CSV file and initializes the is_loaned field as a dictionary.
+    Loads books from the original CSV file and initializes them as Book objects,
+    setting the correct loan status for each copy based on the data in the CSV file.
 
     Args:
         file_path (str): Path to the original file.
 
-
     Returns:
-        list: List of Book objects with dynamic is_loaned fields.
+        list: List of Book objects.
     """
     books = []
     try:
@@ -18,20 +18,24 @@ def load_books_from_file(file_path: str) -> list:
             reader = csv.DictReader(file)
             for row in reader:
                 book = Book(
-                    id=None,  # אין מזהה ייחודי בקובץ המקורי
                     title=row["title"],
                     author=row["author"],
                     category=row["genre"],
                     year=int(row["year"]),
-                    copies=int(row["copies"]),
+                    copies=int(row["copies"])
                 )
-                # יצירת מילון עבור is_loaned לפי מספר העותקים
-                is_loaned = row["is_loaned"].strip().lower() == "yes"
-                book.is_loaned = {i: "yes" if is_loaned else "no" for i in range(book.copies)}
 
-                # השדות הדינמיים הנוספים
-                book.available = book.copies - sum(1 for status in book.is_loaned.values() if status == "yes")
-                book.borrow_count = 0
+                # Initialize the is_loaned dictionary based on the CSV data
+                is_loaned_status = row["is_loaned"].strip().lower()  # "yes" or "no"
+                for i in range(book.copies):
+                    book.is_loaned[i] = is_loaned_status  # Set all copies to the same loan status
+
+                # Update availability count based on loan status
+                if is_loaned_status == "yes":
+                    book.available = 0
+                else:
+                    book.available = book.copies  # All copies are available if not loaned
+
                 books.append(book)
     except FileNotFoundError:
         print(f"File {file_path} not found.")
@@ -42,7 +46,7 @@ def load_books_from_file(file_path: str) -> list:
 
 def save_books_to_file(books: list, file_path: str):
     """
-    Saves books to a new CSV file, including the is_loaned field as a dictionary.
+    Saves books to a new CSV file, including the is_loaned field.
 
     Args:
         books (list): List of Book objects.
@@ -66,55 +70,3 @@ def save_books_to_file(books: list, file_path: str):
                 })
     except Exception as e:
         print(f"Error saving books: {e}")
-
-
-
-def create_working_copy(original_file: str, working_copy: str):
-    """
-    Creates a working copy of the original CSV file.
-
-    Args:
-        original_file (str): Path to the original file.
-        working_copy (str): Path to the working copy.
-    """
-    import shutil
-    try:
-        shutil.copy(original_file, working_copy)
-        print(f"Working copy created at {working_copy}.")
-    except Exception as e:
-        print(f"Error creating working copy: {e}")
-
-
-def borrow_book(self, book_id: int) -> bool:
-    for book in self.books:
-        if book.id == book_id:
-            for copy_id, status in book.is_loaned.items():
-                if status == "no":
-                    book.is_loaned[copy_id] = "yes"
-                    book.available -= 1
-                    book.borrow_count += 1
-                    save_books_to_file(self.books, "books_working_copy.csv")
-                    return True
-    print("No available copies to borrow.")
-    return False
-
-
-def return_book(self, book_id: int, copy_id: int) -> bool:
-    for book in self.books:
-        if book.id == book_id and book.is_loaned.get(copy_id) == "yes":
-            book.is_loaned[copy_id] = "no"
-            book.available += 1
-            save_books_to_file(self.books, "books_working_copy.csv")
-            return True
-    print("Invalid book ID or copy ID.")
-    return False
-
-
-  def has_available_copies(self) -> bool:
-        """
-        Checks if there are available copies for this book.
-
-        Returns:
-            bool: True if at least one copy is not loaned, False otherwise.
-        """
-        return any(status == "no" for status in self.is_loaned.values())

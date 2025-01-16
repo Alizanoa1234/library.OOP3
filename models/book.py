@@ -1,80 +1,98 @@
+import uuid
+
 class Book:
-    """
-    Represents a book in the library system.
-   """
-
-    def __init__(
-            self, id: int, title: str, author: str, category: str, year: int, copies: int
-    ):
+    def __init__(self, title, author, category, year, copies):
         """
-       Initializes a new book with its details.
+        Initializes a Book object.
 
-       Args:
-           id (int): Unique identifier.
-           title (str): Title of the book.
-           author (str): Author's name.
-           category (str): Book's category.
-           year (int): Publication year.
-           copies (int): Total copies in the library.
-       """
-        if copies < 0:
-            raise ValueError("Number of copies cannot be negative.")
-        if not title or not author or not category:
-            raise ValueError("Title, author, and category cannot be empty.")
-
-        self.id = id
+        Args:
+            title (str): The title of the book.
+            author (str): The author of the book.
+            category (str): The category/genre of the book.
+            year (int): The publication year of the book.
+            copies (int): The total number of copies of the book available.
+        """
+        self.book_id = uuid.uuid4()  # Unique identifier for the book
         self.title = title
         self.author = author
         self.category = category
         self.year = year
         self.copies = copies
-        self.available = copies
+        self.is_loaned = {}  # Dictionary tracking the loan status of each copy
+        self.available = copies  # Number of available copies
+        self.borrow_count = 0  # Number of times the book has been borrowed
+        self.waiting_list = []  # List of users waiting for the book
 
+    def __str__(self):
+        """
+        Return a readable string representation of the Book object.
+        """
+        is_loaned_str = ', '.join(
+            [f" {index}: {status}" for index, (copy_id, status) in enumerate(self.is_loaned.items(), start=1)])
+        return f"title: {self.title}, author: {self.author}, copies: {self.copies}, is_loaned: {is_loaned_str}, genre: {self.category}, year: {self.year}"
 
-def update_copies(self, delta: int):
-    """
-    Updates the number of available copies.
-   """
-    if self.available + delta < 0:
-        raise ValueError("Available copies cannot be negative.")
-    self.available += delta
+    def add_loaned_copy(self, copy_id):
+        """
+        Marks a copy as loaned and updates availability.
 
+        Args:
+            copy_id (int): The ID of the copy being loaned.
+        """
+        self.is_loaned[copy_id] = "yes"
+        self.available -= 1
+        self.borrow_count += 1
 
-def is_available(self) -> bool:
-    """
-    Checks if the book is available for lending.
-    """
-    return self.available > 0
+    def return_loaned_copy(self, copy_id):
+        """
+        Marks a loaned copy as returned and updates availability.
 
+        Args:
+            copy_id (int): The ID of the copy being returned.
+        """
+        if copy_id in self.is_loaned and self.is_loaned[copy_id] == "yes":
+            self.is_loaned[copy_id] = "no"
+            self.available += 1
 
-def __str__(self) -> str:
-    """
-    Returns a string representation of the book.
-    """
-    return (f"Book[ID={self.id}, Title={self.title}, Author={self.author},"
-            f" Category={self.category}, Year={self.year}, Copies={self.copies}, Available={self.available}]")
+    def available_copies_count(self):
+        """
+        Returns the number of available copies for this book.
 
+        Returns:
+            int: The number of available copies.
+        """
+        return sum(1 for status in self.is_loaned.values() if status == "no")
 
-def to_dict(self) -> dict:
-    """
-    Converts the book's attributes to a dictionary.
-    """
-    return {
-        "id": self.id,
-        "title": self.title,
-        "author": self.author,
-        "category": self.category,
-        "year": self.year,
-        "copies": self.copies,
-        "available": self.available,
-    }
+    def has_available_copy(self):
+        """
+        Checks if there is at least one available copy of the book.
 
+        Returns:
+            bool: True if at least one copy is available, False otherwise.
+        """
+        return self.available_copies_count() > 0
 
-def __lt__(self, other: object) -> bool:
-    """
-    Compares books by publication year.
-    """
-    if not isinstance(other, Book):
-        return NotImplemented
-    return self.year < other.year
+    def add_to_waiting_list(self, user_id):
+        """
+        Adds a user to the waiting list if no copies are available.
 
+        Args:
+            user_id (str): The unique identifier of the user.
+        """
+        if not self.has_available_copy():
+            self.waiting_list.append(user_id)
+            print(f"User {user_id} added to waiting list.")
+        else:
+            print("There is an available copy. No need to wait.")
+
+    def remove_from_waiting_list(self, user_id):
+        """
+        Removes a user from the waiting list.
+
+        Args:
+            user_id (str): The unique identifier of the user.
+        """
+        if user_id in self.waiting_list:
+            self.waiting_list.remove(user_id)
+            print(f"User {user_id} removed from waiting list.")
+        else:
+            print(f"User {user_id} is not on the waiting list.")
