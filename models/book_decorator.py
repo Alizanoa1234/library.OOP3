@@ -1,51 +1,55 @@
+import pandas as pd
+
 class BookDecorator:
     """
-    A decorator for the Book class that tracks the book's popularity
-    based on the number of times it has been borrowed.
+    A decorator for a DataFrame of books that tracks the popularity of books
+    based on the number of times they have been borrowed.
     """
 
-    def __init__(self, book):
+    def __init__(self, books_df: pd.DataFrame):
         """
-        Initializes the BookDecorator with a Book object.
+        Initializes the BookDecorator with a DataFrame of books.
 
         Args:
-            book (Book): The book object to decorate.
+            books_df (pd.DataFrame): The DataFrame containing the books data.
         """
-        self.book = book
-        self.borrow_count = 0  # Tracks how many times the book has been borrowed.
+        self.books_df = books_df.copy()
+        if "borrow_count" not in self.books_df.columns:
+            self.books_df["borrow_count"] = 0  # Add a column to track borrow counts
 
-    def increase_borrow_count(self):
+    def get_borrow_count(self, book_id: int) -> int:
         """
-        Increases the borrow count by 1.
-        """
-        self.borrow_count += 1
-
-    def get_borrow_count(self) -> int:
-        """
-        Returns the number of times the book has been borrowed.
-
-        Returns:
-            int: The borrow count.
-        """
-        return self.borrow_count
-
-    def __getattr__(self, name):
-        """
-        Delegates attribute access to the wrapped book object.
+        Gets the borrow count for a specific book by its ID.
 
         Args:
-            name (str): The attribute name.
+            book_id (int): The ID of the book.
 
         Returns:
-            Any: The attribute or method from the original Book object.
+            int: The borrow count for the specified book.
         """
-        return getattr(self.book, name)
+        if book_id in self.books_df["id"].values:
+            return int(self.books_df.loc[self.books_df["id"] == book_id, "borrow_count"].values[0])
+        else:
+            print(f"Book ID {book_id} not found.")
+            return 0
 
-    def __str__(self) -> str:
+    def get_most_popular_books(self, top_n: int = 5) -> pd.DataFrame:
         """
-        Returns a string representation of the decorated book, including its borrow count.
+        Returns the top N most popular books based on borrow count.
+
+        Args:
+            top_n (int): The number of top books to return.
 
         Returns:
-            str: A string with the book's details and borrow count.
+            pd.DataFrame: A DataFrame containing the top N most popular books.
         """
-        return f"{str(self.book)} | Borrow Count: {self.borrow_count}"
+        return self.books_df.sort_values(by="borrow_count", ascending=False).head(top_n)
+
+    def __str__(self):
+        """
+        Returns a string representation of the decorated DataFrame.
+
+        Returns:
+            str: A string with the books and their borrow counts.
+        """
+        return str(self.books_df)
