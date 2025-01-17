@@ -11,6 +11,7 @@ class NotificationManager:
         Initializes the NotificationManager with a list of users.
 
         Args:
+
             users (list): A list of dictionaries representing users. Each user has 'name' and 'email' fields.
         """
         self.users = users  # List of users to notify (e.g., [{'name': 'Librarian1', 'email': 'lib1@example.com'}, ...])
