@@ -1,3 +1,5 @@
+import pandas as pd
+
 class BookIterator:
     """
     An iterator for navigating through a DataFrame of books.
@@ -8,9 +10,9 @@ class BookIterator:
         Initializes the iterator with a DataFrame of books.
 
         Args:
-            books_df (pd.DataFrame): The DataFrame of books to iterate over.
+            books_df (pd.DataFrame): The DataFrame containing the books data.
         """
-        self.books_df = books_df.reset_index(drop=True)  # Ensure proper indexing
+        self.books_df = books_df.reset_index(drop=True)  # Ensure consistent indexing
         self.index = 0
 
     def __iter__(self):
@@ -28,9 +30,9 @@ class BookIterator:
         """
         if self.index >= len(self.books_df):
             raise StopIteration
-        book = self.books_df.iloc[self.index]
+        row = self.books_df.iloc[self.index]
         self.index += 1
-        return book
+        return row
 
     def reset(self):
         """
@@ -49,7 +51,20 @@ class BookIterator:
             iterator.filter(category="Fiction", year=2020)
         """
         filtered_df = self.books_df
-        for key, value in kwargs.items():
-            filtered_df = filtered_df[filtered_df[key] == value]
+        for column, value in kwargs.items():
+            filtered_df = filtered_df[filtered_df[column] == value]
         self.books_df = filtered_df.reset_index(drop=True)
         self.reset()
+
+    def paginate(self, page_size: int):
+        """
+        Returns a generator that yields pages of books.
+
+        Args:
+            page_size (int): The number of rows per page.
+
+        Yields:
+            pd.DataFrame: A subset of the books DataFrame for each page.
+        """
+        for start in range(0, len(self.books_df), page_size):
+            yield self.books_df.iloc[start:start + page_size]
