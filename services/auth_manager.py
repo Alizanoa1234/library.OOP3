@@ -2,9 +2,8 @@ import hashlib
 import csv
 from logs.actions import log_error, log_info
 
-
 class AuthManager:
-    def _init_(self, users_file: str):
+    def __init__(self, users_file: str):
         self.users_file = users_file
         self.current_user = None
         self.librarians = self.load_librarians(users_file)
@@ -51,7 +50,6 @@ class AuthManager:
             log_error("Username can only contain letters and numbers.")
             return False
         return True
-
 
     def is_valid_password(self, password: str) -> bool:
         if len(password) < 6:

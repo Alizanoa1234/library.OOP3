@@ -11,7 +11,7 @@ class LibraryManager:
     Manages the library's books, borrowing process, and popular books.
     """
 
-    def _init_(self, file_path: str):
+    def __init__(self, file_path: str):
         """
         Initializes the LibraryManager with books loaded from the specified CSV file.
 
