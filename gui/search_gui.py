@@ -14,6 +14,7 @@ def search_books():
 3. Search by Category
 4. Search by Year
 5. Back to Main Menu
+
 """)
         choice = input("Enter your choice: ").strip()
 

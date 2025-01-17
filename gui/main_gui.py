@@ -6,6 +6,7 @@ from gui.user_gui import user_login
 def main_menu():
     """
     Displays the main menu and navigates to different functionalities.
+
     """
     while True:
         print("""

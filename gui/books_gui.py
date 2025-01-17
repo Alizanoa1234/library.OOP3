@@ -70,6 +70,7 @@ def borrow_book():
             return
     print("Book not found or unavailable.")
 
+
 def return_book():
     """
     Returns a borrowed book.
