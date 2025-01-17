@@ -1,11 +1,9 @@
-from data.books import save_books_to_file
+from data.books import load_books_from_file, save_books_to_file
 from models.book import Book
 from models.book_decorator import BookDecorator
 from models.search_strategy import SearchManager, SearchByName, SearchByAuthor, SearchByCategory, SearchByYear
-from services.observer import Subscriber, ObserverManager
-from utils.logger import log_info, log_error
-
-
+from services.notification_manager import  NotificationManager
+from logs.actions import log_info, log_error
 
 
 class LibraryManager:
@@ -13,177 +11,117 @@ class LibraryManager:
     Manages the library's books, borrowing process, and popular books.
     """
 
-    def __init__(self):
+    def _init_(self, file_path: str):
         """
-        Initializes the LibraryManager with an empty list of books and a dictionary of decorated books.
+        Initializes the LibraryManager with books loaded from the specified CSV file.
+
+        Args:
+            file_path (str): Path to the CSV file.
         """
-        self.books = []  # List of books
-        self.decorators = {}  # Maps book ID to its decorated version
+        self.file_path = file_path  # Path to the original books.csv file
+        self.books = load_books_from_file(self.file_path)  # Load books from the original CSV
+        self.decorators = {book: BookDecorator(book) for book in self.books}  # Decorate books
         self.search_manager = SearchManager(SearchByName())  # Default search strategy is by title
-        self.observer_manager = ObserverManager()
+        self.notification_manager = NotificationManager()
 
-
-    def add_book(self, book: Book):
+    def add_book(self, book: Book, additional_copies: int = 0):
         """
-        Adds a new book to the library and wraps it with a decorator.
+        Adds a new book to the library or increases the number of copies if the book already exists.
 
         Args:
             book (Book): The book to add.
+            additional_copies (int): Additional copies to add to an existing book.
         """
-        if any(b.id == book.id for b in self.books):
-            print(f"Book with ID {book.id} already exists.")
-            return False
+        for existing_book in self.books:
+            if existing_book.title == book.title and existing_book.author == book.author:
+                # Update copies for an existing book
+                existing_book.copies += additional_copies
+                existing_book.available += additional_copies
+                save_books_to_file(self.books, self.file_path)
+                log_info(f"Added {additional_copies} copies to '{existing_book.title}' by {existing_book.author}.")
+                self.notification_manager.notify_all(
+                    f"{additional_copies} additional copies of '{existing_book.title}' by {existing_book.author} are now available."
+                )
+                return True
 
+        # Add new book if it doesn't exist
         self.books.append(book)
-        self.decorators[book.id] = BookDecorator(book)
-        print(f"Book '{book.title}' added successfully.")
+        self.decorators[book] = BookDecorator(book)
+        save_books_to_file(self.books, self.file_path)
+        log_info(f"New book '{book.title}' by {book.author} added successfully.")
+        self.notification_manager.notify_all(f"New book added: '{book.title}' by {book.author}")
         return True
 
-    def remove_book(self, book_id: int) -> bool:
+    def remove_book(self, book: Book) -> bool:
         """
-        Removes a book from the library by its ID.
+        Removes a book from the library.
 
         Args:
-            book_id (int): The ID of the book to remove.
+            book (Book): The book to remove.
 
         Returns:
             bool: True if the book was successfully removed, False otherwise.
         """
-        for book in self.books:
-            if book.id == book_id:
-                self.books.remove(book)
-                del self.decorators[book_id]
-                print(f"Book '{book.title}' removed successfully.")
-                return True
-        print(f"Book with ID {book_id} not found.")
+        if book in self.books:
+            self.books.remove(book)
+            del self.decorators[book]
+            save_books_to_file(self.books, self.file_path)
+            log_info(f"Book '{book.title}' removed successfully.")
+            self.notification_manager.notify_all(f"Book '{book.title}' by {book.author} has been removed.")
+            return True
+
+        log_error(f"Book '{book.title}' by {book.author} not found.")
         return False
 
-    def add_subscriber_to_book(self, book_id: int, librarian_name: str, librarian_email: str):
+    def borrow_book(self, book: Book) -> bool:
         """
-        Adds a librarian to the notification list for a book.
-        """
-        subscriber = Subscriber(librarian_name, librarian_email)
-        self.observer_manager.add_subscriber(book_id, subscriber)
-
-    def remove_subscriber_from_book(self, book_id: int, librarian_email: str):
-        """
-        Removes a librarian from the waitlist for a specific book.
-        Args:
-            book_id (int): The ID of the book.
-            librarian_email (str): The librarian's email.
-        """
-        self.observer_manager.remove_subscriber(book_id, librarian_email)
-
-    def borrow_book(self, book_id: int) -> bool:
-        """
-        Borrows the first available copy of a book.
+        Borrows a book if copies are available or puts the request on the waiting list.
 
         Args:
-            book_id (int): The ID of the book to borrow.
+            book (Book): The book to borrow.
 
         Returns:
             bool: True if the book was successfully borrowed, False otherwise.
         """
-        if not any(book.id == book_id for book in self.books):
-            print(f"Invalid book ID. Available books: {[book.id for book in self.books]}")
+        if book not in self.books:
+            log_error(f"Book '{book.title}' by {book.author} not found in the library.")
             return False
 
-        for book in self.books:
-            if book.id == book_id and book.has_available_copies():
-                for copy_id, status in book.is_loaned.items():
-                    if status == "no":
-                        book.is_loaned[copy_id] = "yes"
-                        book.available -= 1
-                        book.borrow_count += 1
-                        save_books_to_file(self.books, "books_working_copy.csv")
-                        print(f"Borrowed copy {copy_id} of book '{book.title}'.")
-                        return True
-        print("No available copies to borrow.")
-        log_error(f"Failed to borrow book with ID {book_id}. No copies available or invalid ID.")
+        if book.available > 0:
+            book.available -= 1
+            book.borrow_count += 1
+            save_books_to_file(self.books, self.file_path)
+            log_info(f"Book '{book.title}' borrowed successfully.")
+            return True
+        else:
+            log_info(f"No available copies for book '{book.title}'. Adding to waiting list.")
+            self.notification_manager.notify_all(f"Book '{book.title}' by {book.author} is currently unavailable. You've been added to the waiting list.")
+            return False
 
-        return False
-
-
-    def return_book(self, book_id: int) -> bool:
+    def return_book(self, book: Book) -> bool:
         """
-        Returns a borrowed book and updates its availability.
+        Returns a borrowed book and notifies the waiting list.
 
         Args:
-            book_id (int): The ID of the book to return.
+            book (Book): The book to return.
 
         Returns:
             bool: True if the book was successfully returned, False otherwise.
         """
-        if not any(book.id == book_id for book in self.books):
-            print(f"Invalid book ID. Available books: {[book.id for book in self.books]}")
+        if book not in self.books:
+            log_error(f"Book '{book.title}' by {book.author} not found in the library.")
             return False
 
-        for book in self.books:
-            if book.id == book_id:
-                book.update_copies(1)
-                print(f"Book '{book.title}' returned successfully.")
-                self.observer_manager.notify_librarians(book_id, book.title)
-                log_info(f"Book '{book.title}' (ID: {book_id}) returned successfully.")
-                return True
-        print(f"Book with ID {book_id} not found.")
-        log_error(f"Failed to return book with ID {book_id}. Book not found.")
-        return False
-
-    def get_popular_books(self, top_n: int = 10) -> list:
-        """
-        Returns the top N most popular books based on borrow count.
-
-        Args:
-            top_n (int): The number of top books to return. Default is 10.
-
-        Returns:
-            list: A list of the most popular books, sorted by borrow count.
-        """
-        sorted_books = sorted(
-            self.decorators.values(),
-            key=lambda decorator: decorator.get_borrow_count(),
-            reverse=True,
-        )
-        return sorted_books[:top_n]
-
-    def search_books(self, query: str, search_by: str = "title"):
-        """
-        Searches for books using a specific search strategy.
-
-        Args:
-            query (str): The search query.
-            search_by (str): The search type (title, author, or category).
-
-        Returns:
-            list: A list of books matching the search query.
-        """
-        if search_by == "title":
-            self.search_manager.set_strategy(SearchByName())
-        elif search_by == "author":
-            self.search_manager.set_strategy(SearchByAuthor())
-        elif search_by == "category":
-            self.search_manager.set_strategy(SearchByCategory())
-        elif search_by == "year":
-            self.search_manager.set_strategy(SearchByYear())
-        else:
-            raise ValueError(f"Invalid search type: {search_by}")
-
-        return self.search_manager.search(self.books, query)
-
-    def set_search_strategy(self, strategy: str):
-        if strategy == "title":
-            self.search_manager.set_strategy(SearchByName())
-        elif strategy == "author":
-            self.search_manager.set_strategy(SearchByAuthor())
-        elif strategy == "category":
-            self.search_manager.set_strategy(SearchByCategory())
-        else:
-            raise ValueError(f"Unknown search strategy: {strategy}")
+        book.available += 1
+        save_books_to_file(self.books, self.file_path)
+        log_info(f"Book '{book.title}' returned successfully.")
+        self.notification_manager.notify_all(f"Book '{book.title}' by {book.author} is now available. Check it out soon!")
+        return True
 
     def show_available_books(self):
         """
         Displays all books with their available copies.
         """
-        print("Available books:")
+        log_info("Displaying all available books:")
         for book in self.books:
-            print(f"{book.title} - Available copies: {book.available}")
+            print(f"{book.title} by {book.author} - Available copies: {book.available}")

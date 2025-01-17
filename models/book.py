@@ -1,7 +1,8 @@
 import uuid
 
+
 class Book:
-    def __init__(self, title, author, category, year, copies):
+    def __init__(self, title, author, category, year, copies, is_loaned_status):
         """
         Initializes a Book object.
 
@@ -11,6 +12,7 @@ class Book:
             category (str): The category/genre of the book.
             year (int): The publication year of the book.
             copies (int): The total number of copies of the book available.
+            is_loaned_status (str): The loan status for all copies ('yes' or 'no').
         """
         self.book_id = uuid.uuid4()  # Unique identifier for the book
         self.title = title
@@ -18,29 +20,42 @@ class Book:
         self.category = category
         self.year = year
         self.copies = copies
-        self.is_loaned = {}  # Dictionary tracking the loan status of each copy
-        self.available = copies  # Number of available copies
+
+        # Initialize the is_loaned dictionary for all copies
+        self.is_loaned = {i + 1: is_loaned_status for i in range(copies)}
+
+        # Update the available count based on loan status
+        self.available = copies if is_loaned_status == "no" else 0
         self.borrow_count = 0  # Number of times the book has been borrowed
         self.waiting_list = []  # List of users waiting for the book
 
     def __str__(self):
-        """
-        Return a readable string representation of the Book object.
-        """
-        is_loaned_str = ', '.join(
-            [f" {index}: {status}" for index, (copy_id, status) in enumerate(self.is_loaned.items(), start=1)])
-        return f"title: {self.title}, author: {self.author}, copies: {self.copies}, is_loaned: {is_loaned_str}, genre: {self.category}, year: {self.year}"
+        return (f"title: {self.title}, author: {self.author}, copies: {self.copies}, "
+                f"available: {self.available}, is_loaned: {self.is_loaned}, genre: {self.category}, year: {self.year}")
 
-    def add_loaned_copy(self, copy_id):
+    def add_loaned_copy(self):
         """
-        Marks a copy as loaned and updates availability.
+        Marks the first available copy as loaned and updates availability.
 
-        Args:
-            copy_id (int): The ID of the copy being loaned.
+        Returns:
+            int: The ID of the copy that was loaned, or None if no copy was available.
         """
-        self.is_loaned[copy_id] = "yes"
-        self.available -= 1
-        self.borrow_count += 1
+        if self.available == 0:
+            print("No available copies to loan.")
+            return None
+
+        # Find the first available copy
+        for copy_id, status in self.is_loaned.items():
+            if status == "no":  # Copy is available
+                self.is_loaned[copy_id] = "yes"
+                self.available -= 1
+                self.borrow_count += 1
+                print(f"Copy ID {copy_id} loaned successfully.")
+                return copy_id
+
+        # Fallback in case something unexpected happens
+        print("No available copies found (unexpected).")
+        return None
 
     def return_loaned_copy(self, copy_id):
         """
@@ -52,6 +67,8 @@ class Book:
         if copy_id in self.is_loaned and self.is_loaned[copy_id] == "yes":
             self.is_loaned[copy_id] = "no"
             self.available += 1
+        else:
+            print(f"Copy ID {copy_id} is not currently loaned.")
 
     def available_copies_count(self):
         """

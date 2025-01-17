@@ -1,10 +1,9 @@
-import csv
+import pandas as pd
 from models.book import Book
 
 def load_books_from_file(file_path: str) -> list:
     """
-    Loads books from the original CSV file and initializes them as Book objects,
-    setting the correct loan status for each copy based on the data in the CSV file.
+    Loads books from the original CSV file and initializes them as Book objects.
 
     Args:
         file_path (str): Path to the original file.
@@ -14,29 +13,20 @@ def load_books_from_file(file_path: str) -> list:
     """
     books = []
     try:
-        with open(file_path, "r") as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                book = Book(
-                    title=row["title"],
-                    author=row["author"],
-                    category=row["genre"],
-                    year=int(row["year"]),
-                    copies=int(row["copies"])
-                )
+        # Load CSV into a Pandas DataFrame
+        df = pd.read_csv(file_path)
 
-                # Initialize the is_loaned dictionary based on the CSV data
-                is_loaned_status = row["is_loaned"].strip().lower()  # "yes" or "no"
-                for i in range(book.copies):
-                    book.is_loaned[i] = is_loaned_status  # Set all copies to the same loan status
-
-                # Update availability count based on loan status
-                if is_loaned_status == "yes":
-                    book.available = 0
-                else:
-                    book.available = book.copies  # All copies are available if not loaned
-
-                books.append(book)
+        # Iterate over rows and create Book objects
+        for _, row in df.iterrows():
+            book = Book(
+                title=row["title"],
+                author=row["author"],
+                category=row["genre"],
+                year=int(row["year"]),
+                copies=int(row["copies"]),
+                is_loaned_status=row["is_loaned"].strip().lower()  # Pass the loan status directly
+            )
+            books.append(book)
     except FileNotFoundError:
         print(f"File {file_path} not found.")
     except Exception as e:
@@ -53,20 +43,22 @@ def save_books_to_file(books: list, file_path: str):
         file_path (str): Path to the CSV file.
     """
     try:
-        with open(file_path, "w", newline="") as file:
-            fieldnames = ["title", "author", "is_loaned", "copies", "genre", "year", "available", "borrow_count"]
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
-            writer.writeheader()
-            for book in books:
-                writer.writerow({
-                    "title": book.title,
-                    "author": book.author,
-                    "is_loaned": str(book.is_loaned),  # המרת המילון למחרוזת
-                    "copies": book.copies,
-                    "genre": book.category,
-                    "year": book.year,
-                    "available": book.available,
-                    "borrow_count": book.borrow_count,
-                })
+        # Create a list of dictionaries to save in the DataFrame
+        data = []
+        for book in books:
+            data.append({
+                "title": book.title,
+                "author": book.author,
+                "is_loaned": str(book.is_loaned),  # Convert dictionary to string
+                "copies": book.copies,
+                "genre": book.category,
+                "year": book.year,
+                "available": book.available,
+                "borrow_count": book.borrow_count,
+            })
+
+        # Create a DataFrame and save to CSV
+        df = pd.DataFrame(data)
+        df.to_csv(file_path, index=False)
     except Exception as e:
         print(f"Error saving books: {e}")
