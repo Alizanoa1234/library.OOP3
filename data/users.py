@@ -1,5 +1,6 @@
-import csv
+import pandas as pd
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 class LibrarianManager:
     """
@@ -21,11 +22,11 @@ class LibrarianManager:
         If the file does not exist, it creates it with default headers.
         """
         try:
-            with open(self.USERS_FILE, 'x', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow(['username', 'password'])  # File headers
-        except FileExistsError:
-            pass  # File already exists, no need to initialize again
+            # Check if the file exists, if not, create it with headers
+            pd.read_csv(self.USERS_FILE)
+        except FileNotFoundError:
+            df = pd.DataFrame(columns=['username', 'password'])
+            df.to_csv(self.USERS_FILE, index=False)
 
     def register_librarian(self, username, password):
         """
@@ -39,14 +40,15 @@ class LibrarianManager:
             tuple: (bool, str) indicating success or failure and a message.
         """
         hashed_password = generate_password_hash(password)
+        df = pd.read_csv(self.USERS_FILE)
 
-        if self.is_librarian_exists(username):
+        if username in df['username'].values:
             return False, "Username already exists"
 
-        # Append the librarian's credentials to the file
-        with open(self.USERS_FILE, 'a', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow([username, hashed_password])
+        # Append the new librarian
+        new_row = pd.DataFrame({'username': [username], 'password': [hashed_password]})
+        df = pd.concat([df, new_row], ignore_index=True)
+        df.to_csv(self.USERS_FILE, index=False)
         return True, "Librarian registered successfully"
 
     def is_librarian_exists(self, username):
@@ -60,15 +62,11 @@ class LibrarianManager:
             bool: True if the librarian exists, False otherwise.
         """
         try:
-            with open(self.USERS_FILE, 'r') as file:
-                reader = csv.reader(file)
-                next(reader, None)  # Skip the headers
-                for row in reader:
-                    if row[0] == username:
-                        return True
+            df = pd.read_csv(self.USERS_FILE)
+            return username in df['username'].values
         except FileNotFoundError:
             self._initialize_users_file()
-        return False
+            return False
 
     def authenticate_librarian(self, username, password):
         """
@@ -82,13 +80,11 @@ class LibrarianManager:
             bool: True if authentication is successful, False otherwise.
         """
         try:
-            with open(self.USERS_FILE, 'r') as file:
-                reader = csv.reader(file)
-                next(reader, None)  # Skip the headers
-                for row in reader:
-                    stored_username, stored_password = row
-                    if username == stored_username and check_password_hash(stored_password, password):
-                        return True
+            df = pd.read_csv(self.USERS_FILE)
+            user = df.loc[df['username'] == username]
+            if not user.empty:
+                stored_password = user.iloc[0]['password']
+                return check_password_hash(stored_password, password)
         except FileNotFoundError:
             self._initialize_users_file()
         return False

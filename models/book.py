@@ -50,7 +50,7 @@ class Book:
                 self.is_loaned[copy_id] = "yes"
                 self.available -= 1
                 self.borrow_count += 1
-                print(f"Copy ID {copy_id} loaned successfully.")
+                print(f"Book '{self.title}', Copy ID {copy_id} loaned successfully.")
                 return copy_id
 
         # Fallback in case something unexpected happens

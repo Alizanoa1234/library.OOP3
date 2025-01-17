@@ -1,66 +1,53 @@
+import pandas as pd
 from abc import ABC, abstractmethod
 
 # Abstract base class for search strategy
 class SearchStrategy(ABC):
-    # Abstract method that all subclasses must implement
     @abstractmethod
-    def search(self, books, criteria):
+    def search(self, books_df, criteria):
+        """
+        Abstract method that all subclasses must implement.
+        Args:
+            books_df (pd.DataFrame): The DataFrame containing the books data.
+            criteria (str): The search criteria.
+        Returns:
+            pd.DataFrame: Subset of the books DataFrame matching the criteria.
+        """
         pass
 
-# Search by book title
+
 class SearchByName(SearchStrategy):
-    # Implements search logic for matching the title
-    def search(self, books, criteria):
-        return [book for book in books if criteria.lower() in book.title.lower()]
+    def search(self, books_df, criteria):
+        return books_df[books_df["title"].str.contains(criteria, case=False, na=False)]
 
-# Search by book author
+
 class SearchByAuthor(SearchStrategy):
-    # Implements search logic for matching the author
-    def search(self, books, criteria):
-        return [book for book in books if criteria.lower() in book.author.lower()]
+    def search(self, books_df, criteria):
+        return books_df[books_df["author"].str.contains(criteria, case=False, na=False)]
 
-# Search by book category
+
 class SearchByCategory(SearchStrategy):
-    # Implements search logic for matching the category
-    def search(self, books, criteria):
-        return [book for book in books if criteria.lower() in book.category.lower()]
+    def search(self, books_df, criteria):
+        return books_df[books_df["category"].str.contains(criteria, case=False, na=False)]
+
 
 class SearchByYear(SearchStrategy):
-    def search(self, books, criteria):
-        return [book for book in books if book.year == int(criteria)]
+    def search(self, books_df, criteria):
+        return books_df[books_df["year"] == int(criteria)]
+
 
 class SearchByID(SearchStrategy):
-    def search(self, books, criteria):
-        return [book for book in books if book.id == int(criteria)]
-
-
+    def search(self, books_df, criteria):
+        return books_df[books_df["id"] == int(criteria)]
 
 
 # Manager class for handling different search strategies
 class SearchManager:
-    # Initializes the manager with a specific search strategy
     def __init__(self, strategy: SearchStrategy):
         self.strategy = strategy
 
-    # Allows changing the search strategy at runtime
     def set_strategy(self, strategy: SearchStrategy):
         self.strategy = strategy
 
-    # Executes the current strategy's search function
-    def search(self, books, criteria):
-        return self.strategy.search(books, criteria)
-
-
-#איך קורים לSERCHSRATGY
-## טעינת ספרים מקובץ CSV
-# books = load_books_from_file('books.csv')
-#
-# # חיפוש לפי שם ספר
-# search_manager = SearchManager(SearchByName())
-# results_by_name = search_manager.search(books, "Python")
-# print(f"Books found by name: {[book.title for book in results_by_name]}")
-#
-# # מעבר לחיפוש לפי מחבר
-# search_manager.set_strategy(SearchByAuthor())
-# results_by_author = search_manager.search(books, "Mark Twain")
-# print(f"Books found by author: {[book.title for book in results_by_author]}")
+    def search(self, books_df, criteria):
+        return self.strategy.search(books_df, criteria)
