@@ -1,4 +1,4 @@
-from data.books import load_books_from_file, save_books_to_file
+from data.books import row_to_book, save_books_to_file
 from models.book import Book
 from models.book_decorator import BookDecorator
 from models.search_strategy import SearchManager, SearchByName, SearchByAuthor, SearchByCategory, SearchByYear
@@ -19,7 +19,7 @@ class LibraryManager:
             file_path (str): Path to the CSV file.
         """
         self.file_path = file_path  # Path to the original books.csv file
-        self.books = load_books_from_file(self.file_path)  # Load books from the original CSV
+        self.books = row_to_book(self.file_path)  # Load books from the original CSV
         self.decorators = {book: BookDecorator(book) for book in self.books}  # Decorate books
         self.search_manager = SearchManager(SearchByName())  # Default search strategy is by title
         self.notification_manager = NotificationManager()
