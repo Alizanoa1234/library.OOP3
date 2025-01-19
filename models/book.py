@@ -67,6 +67,7 @@ class Book:
         if copy_id in self.is_loaned and self.is_loaned[copy_id] == "yes":
             self.is_loaned[copy_id] = "no"
             self.available += 1
+            print(f"Book '{self.title}', Copy ID {copy_id} returned successfully.")
         else:
             print(f"Copy ID {copy_id} is not currently loaned.")
 
