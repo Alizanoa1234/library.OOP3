@@ -12,6 +12,9 @@ class BookIterator:
         Args:
             books_df (pd.DataFrame): The DataFrame containing the books data.
         """
+        if books_df.empty:
+            raise ValueError("The books DataFrame is empty. Cannot initialize iterator.")
+
         self.books_df = books_df.reset_index(drop=True)  # Ensure consistent indexing
         self.index = 0
 

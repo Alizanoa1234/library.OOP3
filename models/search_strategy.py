@@ -33,7 +33,7 @@ class SearchByCategory(SearchStrategy):
 
 class SearchByYear(SearchStrategy):
     def search(self, books_df, criteria):
-        return books_df[books_df["year"] == int(criteria)]
+        return books_df[books_df["year"].astype(str).str.contains(criteria, case=False, na=False)]
 
 
 class SearchByID(SearchStrategy):

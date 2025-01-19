@@ -3,17 +3,19 @@ from models.book import Book
 
 from data.books import load_books_from_file, save_books_to_file
 from data.users import LibrarianManager
+from models.book_iterator import BookIterator
+from models.search_strategy import SearchManager, SearchByName
 
 
 def main():
-	# # Load books from the CSV file
-	# file_path = "books.csv"
-	# books = load_books_from_file(file_path)
-	#
-	# # Print the books info before any action (without modifying anything)
-	# print("Books available before any action:")
-	# for book in books:
-	# 	print(book)
+	#  Load books from the CSV file
+	file_path = "books.csv"
+	books  = load_books_from_file(file_path)
+
+	# Print the books info before any action (without modifying anything)
+	print("Books available before any action:")
+	for book in books:
+		print(book)
 	# print("-" * 40)
 	#
 	# # Create a book object with initial data
@@ -50,27 +52,40 @@ def main():
 	# print("Final book status:")
 	# print(book)
 
-	book = Book("The Great Gatsby", "F. Scott Fitzgerald", "Classic", 1925, 3, "no")
+	# book = Book("The Great Gatsby", "F. Scott Fitzgerald", "Classic", 1925, 3, "no")
+	#
+	# print("Initial book status:")
+	# print(book)  # הדפסת מצב הספר
+	#
+	# # השאלת ספר
+	# book.add_loaned_copy()
+	# book.add_loaned_copy()
+	# book.add_loaned_copy()
+	# book.add_loaned_copy()
+	# print("\nAfter borrowing one copy:")
+	# print(book)  # הדפסת מצב הספר לאחר השאלה
+	#
+	# # החזרת ספר
+	# book.return_loaned_copy()
+	# book.return_loaned_copy()
+	# book.return_loaned_copy()
+	# book.return_loaned_copy()
+	# print("\nAfter returning one copy:")
+	# print(book)  # הדפסת מצב הספר לאחר החזרה
+	# יצירת DataFrame לדוגמה
 
-	print("Initial book status:")
-	print(book)  # הדפסת מצב הספר
+	# יצירת מחלקת חיפוש (למשל, חיפוש לפי שם)
+	search_manager = SearchManager(SearchByName())
+	results = search_manager.search(books, "Python")
+	print("Books found by name:")
+	print(results)
 
-	# השאלת ספר
-	book.add_loaned_copy()
-	book.add_loaned_copy()
-	book.add_loaned_copy()
-	book.add_loaned_copy()
-	print("\nAfter borrowing one copy:")
-	print(book)  # הדפסת מצב הספר לאחר השאלה
+	# יצירת איטרטור לספרים שנמצאו
+	iterator = BookIterator(results)
 
-	# החזרת ספר
-	book.return_loaned_copy()
-	book.return_loaned_copy()
-	book.return_loaned_copy()
-	book.return_loaned_copy()
-	print("\nAfter returning one copy:")
-	print(book)  # הדפסת מצב הספר לאחר החזרה
-
+	print("\nIterating through found books:")
+	for book in iterator:
+		print(book)
 
 if __name__ == "__main__":
 	main()
