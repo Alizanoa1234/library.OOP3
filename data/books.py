@@ -1,5 +1,7 @@
 import pandas as pd
 from models.book import Book
+from logs.actions import log_info, log_error
+
 
 def load_books_from_file(file_path: str) -> list:
     """
@@ -15,6 +17,8 @@ def load_books_from_file(file_path: str) -> list:
     try:
         # Load CSV into a Pandas DataFrame
         df = pd.read_csv(file_path)
+        log_info(f"Loaded books data from {file_path} successfully.")
+
 
         # Iterate over rows and create Book objects
         for _, row in df.iterrows():
@@ -28,9 +32,9 @@ def load_books_from_file(file_path: str) -> list:
             )
             books.append(book)
     except FileNotFoundError:
-        print(f"File {file_path} not found.")
+        log_error(f"File {file_path} not found.")
     except Exception as e:
-        print(f"Error loading books: {e}")
+        log_error(f"Error loading books: {e}")
     return books
 
 
@@ -60,5 +64,7 @@ def save_books_to_file(books: list, file_path: str):
         # Create a DataFrame and save to CSV
         df = pd.DataFrame(data)
         df.to_csv(file_path, index=False)
+        log_info(f"Books data saved to {file_path} successfully.")
+
     except Exception as e:
-        print(f"Error saving books: {e}")
+        log_error(f"Error saving books: {e}")

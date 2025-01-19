@@ -57,19 +57,22 @@ class Book:
         print("No available copies found (unexpected).")
         return None
 
-    def return_loaned_copy(self, copy_id):
+    def return_loaned_copy(self):
         """
-        Marks a loaned copy as returned and updates availability.
+        Marks the first loaned copy as returned and updates availability.
 
-        Args:
-            copy_id (int): The ID of the copy being returned.
+        This method automatically returns the first loaned copy (copy with status "yes").
         """
-        if copy_id in self.is_loaned and self.is_loaned[copy_id] == "yes":
-            self.is_loaned[copy_id] = "no"
-            self.available += 1
-            print(f"Book '{self.title}', Copy ID {copy_id} returned successfully.")
-        else:
-            print(f"Copy ID {copy_id} is not currently loaned.")
+        # Find the first loaned copy (status == "yes")
+        for copy_id, status in self.is_loaned.items():
+            if status == "yes":  # First loaned copy found
+                self.is_loaned[copy_id] = "no"
+                self.available += 1
+                print(f"Book '{self.title}', Copy ID {copy_id} returned successfully.")
+                return  # Exit the method after returning the first copy
+
+        # If no loaned copy was found, print a message
+        print(f"No loaned copies found for book '{self.title}'.")
 
     def available_copies_count(self):
         """

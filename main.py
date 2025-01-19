@@ -57,11 +57,17 @@ def main():
 
 	# השאלת ספר
 	book.add_loaned_copy()
+	book.add_loaned_copy()
+	book.add_loaned_copy()
+	book.add_loaned_copy()
 	print("\nAfter borrowing one copy:")
 	print(book)  # הדפסת מצב הספר לאחר השאלה
 
 	# החזרת ספר
-	book.return_loaned_copy(1)
+	book.return_loaned_copy()
+	book.return_loaned_copy()
+	book.return_loaned_copy()
+	book.return_loaned_copy()
 	print("\nAfter returning one copy:")
 	print(book)  # הדפסת מצב הספר לאחר החזרה
 
