@@ -11,7 +11,7 @@ class UsersManager:
 
     USERS_FILE = 'data/users.csv'
 
-    def _init_(self):
+    def __init__(self):
         """
         Initialize the librarian manager and ensure the users file exists.
         """

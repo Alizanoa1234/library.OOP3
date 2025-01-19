@@ -6,12 +6,11 @@ class NotificationManager:
     Handles notifications to all users when events occur in the library system.
     """
 
-    def _init_(self, users: list):
+    def __init__(self, users: list):
         """
         Initializes the NotificationManager with a list of users.
 
-        Args:
-
+        Args:z
             users (list): A list of dictionaries representing users. Each user has 'name' and 'email' fields.
         """
         self.users = users  # List of users to notify (e.g., [{'name': 'Librarian1', 'email': 'lib1@example.com'}, ...])
