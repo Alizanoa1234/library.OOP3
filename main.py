@@ -2,7 +2,7 @@ from models.book import Book
 # main.py
 
 from data.books import load_books_from_file, save_books_to_file
-from data.users import LibrarianManager
+from data.users import UsersManager
 from models.book_iterator import BookIterator
 from models.search_strategy import SearchManager, SearchByName
 

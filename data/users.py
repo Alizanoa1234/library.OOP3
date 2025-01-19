@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from logs.actions import log_info, log_error
 
 
-class LibrarianManager:
+class UsersManager:
     """
     A class to manage librarian users in the library system.
     Handles librarian registration, authentication, and user management.
@@ -11,7 +11,7 @@ class LibrarianManager:
 
     USERS_FILE = 'data/users.csv'
 
-    def _init_(self):
+    def __init__(self):
         """
         Initialize the librarian manager and ensure the users file exists.
         """
