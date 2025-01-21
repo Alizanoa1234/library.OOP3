@@ -1,6 +1,3 @@
-import uuid
-
-
 class Book:
     def __init__(self, title, author, category, year, copies, is_loaned_status):
         """
@@ -14,7 +11,6 @@ class Book:
             copies (int): The total number of copies of the book available.
             is_loaned_status (str): The loan status for all copies ('yes' or 'no').
         """
-        self.book_id = uuid.uuid4()  # Unique identifier for the book
         self.title = title
         self.author = author
         self.category = category
@@ -25,13 +21,13 @@ class Book:
         self.is_loaned = {i + 1: is_loaned_status for i in range(copies)}
 
         # Update the available count based on loan status
-        self.available = copies if is_loaned_status == "no" else 0
+        self.available = sum(1 for status in self.is_loaned.values() if status == "no")
         self.borrow_count = 0  # Number of times the book has been borrowed
         self.waiting_list = []  # List of users waiting for the book
 
     def __str__(self):
-        return (f"title: {self.title}, author: {self.author}, copies: {self.copies}, "
-                f"available: {self.available}, is_loaned: {self.is_loaned}, genre: {self.category}, year: {self.year}")
+        return (f"Title: {self.title}, Author: {self.author}, Copies: {self.copies}, "
+                f"Available: {self.available}, Loaned: {self.is_loaned}, Genre: {self.category}, Year: {self.year}")
 
     def add_loaned_copy(self):
         """
@@ -41,8 +37,12 @@ class Book:
             int: The ID of the copy that was loaned, or None if no copy was available.
         """
         if self.available == 0:
-            print("No available copies to loan.")
-            return None
+            #FIXME- אך לדעת את מי להוסיף
+            self.waiting_list.append(user_id)
+            print(f"User {user_id} added to the waiting list for '{self.title}'.")
+            # Update the DataFrame with the new waiting list
+            data_frame.loc[data_frame['title'] == self.title, 'waiting_list'] = [self.waiting_list]
+            return "added_to_waiting_list"
 
         # Find the first available copy
         for copy_id, status in self.is_loaned.items():
@@ -50,8 +50,14 @@ class Book:
                 self.is_loaned[copy_id] = "yes"
                 self.available -= 1
                 self.borrow_count += 1
+
+                # Update the DataFrame
+                data_frame.loc[data_frame['title'] == self.title, 'is_loaned'] = [self.is_loaned]
+                data_frame.loc[data_frame['title'] == self.title, 'available'] = self.available
+                data_frame.loc[data_frame['title'] == self.title, 'borrow_count'] = self.borrow_count
+
                 print(f"Book '{self.title}', Copy ID {copy_id} loaned successfully.")
-                return copy_id
+                return f"Book '{self.title}' loaned successfully. (Copy ID: {copy_id})"
 
         # Fallback in case something unexpected happens
         print("No available copies found (unexpected).")
