@@ -1,102 +1,93 @@
-from models.book import Book
+import tkinter as tk
+from tkinter import messagebox
 from services.library_manager import LibraryManager
-from data.users import UsersManager  # Import UsersManager
+from logs.actions import log_info, log_error
 
-# Initialize UsersManager
-users_manager = UsersManager()
+class BooksGUI:
+    def __init__(self, root):
+        self.root = tk.Toplevel(root)
+        self.root.title("Books Management")
+        self.library_manager = LibraryManager("data/books.csv")
+        self.create_books_menu()
 
-# Load the users file for NotificationManager compatibility
-users_file = users_manager.USERS_FILE
+    def create_books_menu(self):
+        tk.Label(self.root, text="Manage Books", font=("Helvetica", 16)).pack(pady=20)
 
-# Initialize LibraryManager with the required file paths
-library_manager = LibraryManager("data/books.csv")
+        buttons = [
+            ("Add Book", self.add_book_screen),
+            ("Remove Book", self.remove_book_screen),
+            ("View Books", self.view_books_screen),
+            ("Back", self.root.destroy)
+        ]
 
-def manage_books():
-    """
-    Displays the book management menu.
-    """
-    while True:
-        print("""
---- Manage Books ---
-1. Add Book
-2. Remove Book
-3. Borrow Book
-4. Return Book
-5. Show Available Books
-6. Back to Main Menu
-""")
-        choice = input("Enter your choice: ").strip()
+        for text, command in buttons:
+            tk.Button(self.root, text=text, width=20, command=command).pack(pady=10)
 
-        if choice == "1":
-            add_book()
-        elif choice == "2":
-            remove_book()
-        elif choice == "3":
-            borrow_book()
-        elif choice == "4":
-            return_book()
-        elif choice == "5":
-            show_available_books()
-        elif choice == "6":
-            break
-        else:
-            print("Invalid choice. Please try again.")
+    def add_book_screen(self):
+        self.clear_screen()
+        tk.Label(self.root, text="Add Book", font=("Helvetica", 14)).pack(pady=10)
+        entries = {}
+        for label in ["Title", "Author", "Year", "Category", "Copies"]:
+            tk.Label(self.root, text=label).pack()
+            entry = tk.Entry(self.root)
+            entry.pack()
+            entries[label.lower()] = entry
 
-def add_book():
-    """
-    Adds a new book or increases copies of an existing book.
-    """
-    try:
-        title = input("Enter book title: ").strip()
-        author = input("Enter author: ").strip()
-        category = input("Enter category: ").strip()
-        year = int(input("Enter year: ").strip())
-        copies = int(input("Enter number of copies: ").strip())
-        book = Book(title, author, category, year, copies)
-        if library_manager.add_book(book, additional_copies=copies):
-            print(f"Book '{title}' by {author} added/updated successfully.")
-        else:
-            print(f"Failed to add/update book '{title}' by {author}.")
-    except ValueError:
-        print("Invalid input. Please enter valid details.")
+        def submit():
+            try:
+                from models.book import Book
+                book = Book(
+                    title=entries["title"].get(),
+                    author=entries["author"].get(),
+                    year=int(entries["year"].get()),
+                    category=entries["category"].get(),
+                    copies=int(entries["copies"].get())
+                )
+                if self.library_manager.add_book(book):
+                    log_info(f"Book '{book.title}' added successfully.")
+                    messagebox.showinfo("Success", "Book added successfully!")
+                else:
+                    log_error(f"Failed to add book '{book.title}'.")
+                    messagebox.showerror("Error", "Failed to add book.")
+            except Exception as e:
+                log_error(f"Error adding book: {e}")
+                messagebox.showerror("Error", str(e))
 
-def remove_book():
-    """
-    Removes a book from the library.
-    """
-    title = input("Enter book title to remove: ").strip()
-    author = input("Enter author: ").strip()
-    if library_manager.remove_book(title, author):
-        print(f"Book '{title}' by {author} removed successfully.")
-    else:
-        print(f"Failed to remove book '{title}' by {author}.")
+        tk.Button(self.root, text="Add", command=submit).pack(pady=5)
+        tk.Button(self.root, text="Back", command=self.create_books_menu).pack(pady=5)
 
-def borrow_book():
-    """
-    Borrows a book if available.
-    """
-    title = input("Enter book title to borrow: ").strip()
-    author = input("Enter author: ").strip()
-    if library_manager.borrow_book(title, author):
-        print(f"Book '{title}' borrowed successfully.")
-    else:
-        print(f"Book '{title}' is unavailable or not found.")
+    def remove_book_screen(self):
+        self.clear_screen()
+        tk.Label(self.root, text="Remove Book", font=("Helvetica", 14)).pack(pady=10)
+        title_entry = tk.Entry(self.root)
+        tk.Label(self.root, text="Title").pack()
+        title_entry.pack()
+        author_entry = tk.Entry(self.root)
+        tk.Label(self.root, text="Author").pack()
+        author_entry.pack()
 
-def return_book():
-    """
-    Returns a borrowed book.
-    """
-    title = input("Enter book title to return: ").strip()
-    author = input("Enter author: ").strip()
-    if library_manager.return_book(title, author):
-        print(f"Book '{title}' returned successfully.")
-    else:
-        print(f"Failed to return book '{title}' by {author}.")
+        def submit():
+            if self.library_manager.remove_book(title_entry.get(), author_entry.get()):
+                log_info(f"Book '{title_entry.get()}' removed successfully.")
+                messagebox.showinfo("Success", "Book removed successfully!")
+            else:
+                log_error(f"Failed to remove book '{title_entry.get()}'.")
+                messagebox.showerror("Error", "Failed to remove book.")
 
-def show_available_books():
-    """
-    Displays all books with their available copies.
-    """
-    print("\n--- Available Books ---")
-    library_manager.show_available_books()
-    print("-----------------------")
+        tk.Button(self.root, text="Remove", command=submit).pack(pady=5)
+        tk.Button(self.root, text="Back", command=self.create_books_menu).pack(pady=5)
+
+    def view_books_screen(self):
+        self.clear_screen()
+        books = self.library_manager.get_all_books()
+        tk.Label(self.root, text="Books", font=("Helvetica", 14)).pack(pady=10)
+        text = tk.Text(self.root)
+        text.pack()
+        for book in books:
+            text.insert("end", f"{book}\n")
+
+        tk.Button(self.root, text="Back", command=self.create_books_menu).pack(pady=5)
+
+    def clear_screen(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
