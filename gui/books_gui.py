@@ -1,7 +1,15 @@
 from models.book import Book
 from services.library_manager import LibraryManager
+from data.users import UsersManager  # Import UsersManager
 
-library_manager = LibraryManager("data/books.csv", [])
+# Initialize UsersManager
+users_manager = UsersManager()
+
+# Load the users file for NotificationManager compatibility
+users_file = users_manager.USERS_FILE
+
+# Initialize LibraryManager with the required file paths
+library_manager = LibraryManager("data/books.csv")
 
 def manage_books():
     """
@@ -14,7 +22,8 @@ def manage_books():
 2. Remove Book
 3. Borrow Book
 4. Return Book
-5. Back to Main Menu
+5. Show Available Books
+6. Back to Main Menu
 """)
         choice = input("Enter your choice: ").strip()
 
@@ -27,6 +36,8 @@ def manage_books():
         elif choice == "4":
             return_book()
         elif choice == "5":
+            show_available_books()
+        elif choice == "6":
             break
         else:
             print("Invalid choice. Please try again.")
@@ -42,7 +53,10 @@ def add_book():
         year = int(input("Enter year: ").strip())
         copies = int(input("Enter number of copies: ").strip())
         book = Book(title, author, category, year, copies)
-        library_manager.add_book(book, additional_copies=copies)
+        if library_manager.add_book(book, additional_copies=copies):
+            print(f"Book '{title}' by {author} added/updated successfully.")
+        else:
+            print(f"Failed to add/update book '{title}' by {author}.")
     except ValueError:
         print("Invalid input. Please enter valid details.")
 
@@ -52,11 +66,10 @@ def remove_book():
     """
     title = input("Enter book title to remove: ").strip()
     author = input("Enter author: ").strip()
-    for book in library_manager.books:
-        if book.title == title and book.author == author:
-            library_manager.remove_book(book)
-            return
-    print("Book not found.")
+    if library_manager.remove_book(title, author):
+        print(f"Book '{title}' by {author} removed successfully.")
+    else:
+        print(f"Failed to remove book '{title}' by {author}.")
 
 def borrow_book():
     """
@@ -64,12 +77,10 @@ def borrow_book():
     """
     title = input("Enter book title to borrow: ").strip()
     author = input("Enter author: ").strip()
-    for book in library_manager.books:
-        if book.title == title and book.author == author:
-            library_manager.borrow_book(book)
-            return
-    print("Book not found or unavailable.")
-
+    if library_manager.borrow_book(title, author):
+        print(f"Book '{title}' borrowed successfully.")
+    else:
+        print(f"Book '{title}' is unavailable or not found.")
 
 def return_book():
     """
@@ -77,8 +88,15 @@ def return_book():
     """
     title = input("Enter book title to return: ").strip()
     author = input("Enter author: ").strip()
-    for book in library_manager.books:
-        if book.title == title and book.author == author:
-            library_manager.return_book(book)
-            return
-    print("Book not found.")
+    if library_manager.return_book(title, author):
+        print(f"Book '{title}' returned successfully.")
+    else:
+        print(f"Failed to return book '{title}' by {author}.")
+
+def show_available_books():
+    """
+    Displays all books with their available copies.
+    """
+    print("\n--- Available Books ---")
+    library_manager.show_available_books()
+    print("-----------------------")
