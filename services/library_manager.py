@@ -18,10 +18,12 @@ class LibraryManager:
         Args:
             file_path (str): Path to the CSV file.
         """
+
+
+        self.strategy = SearchByName()  # Default strategy
         self.file_path = file_path  # Path to the original books.csv file
         self.books = load_books_from_file(self.file_path)  # Load books from the original CSV
         self.decorators = {(book.title, book.author): BookDecorator(book) for book in self.books}  # Decorate books
-        self.search_manager = SearchManager(SearchByName())  # Default search strategy is by title
         self.notification_manager = NotificationManager()
 
     def add_book(self, book: Book, additional_copies: int = 0) -> bool:
@@ -132,3 +134,19 @@ class LibraryManager:
         log_info("Displaying all available books:")
         for book in self.books:
             print(f"{book.title} by {book.author} - Available copies: {book.available}")
+
+    def get_all_books(self):
+        """Retrieve all books as a list."""
+        return self.books
+
+    def get_available_books(self):
+        """Retrieve books with at least one available copy."""
+        return [book for book in self.books if book.available > 0]
+
+    def get_borrowed_books(self):
+        """Retrieve books that have all copies loaned out."""
+        return [book for book in self.books if book.available == 0]
+
+    def get_popular_books(self, top_n=10):
+        """Retrieve the top N most popular books based on borrow count and waiting list size."""
+        return sorted(self.books, key=lambda book: book.borrow_count + len(book.waiting_list), reverse=True)[:top_n]
