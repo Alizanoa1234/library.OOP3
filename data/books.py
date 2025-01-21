@@ -23,34 +23,94 @@ class DataManager:
     def get_data(self):
         return self.data
 
+def adjust_is_loaned(row):
+    """
+    Adjust the 'is_loaned' value to ensure it matches the number of copies.
+    Expands or truncates the dictionary based on the number of copies.
+
+    Args:
+        row (pd.Series): A row from the DataFrame.
+
+    Returns:
+        dict: Updated 'is_loaned' dictionary.
+    """
+    num_copies = row['copies']
+    is_loaned_dict = eval(row['is_loaned']) if isinstance(row['is_loaned'], str) else row['is_loaned']
+
+    # Adjust the size of the dictionary
+    is_loaned_dict = {
+        i + 1: is_loaned_dict.get(i + 1, 'no') for i in range(num_copies)
+    }
+
+    return is_loaned_dict
+def parse_is_loaned(value, num_copies):
+    """
+    Parses the 'is_loaned' value from the CSV into a valid dictionary.
+
+    Args:
+        value (str): The raw 'is_loaned' value from the CSV.
+        num_copies (int): The number of copies of the book.
+
+    Returns:
+        dict: A dictionary representing the loan status of each copy.
+    """
+    if isinstance(value, str):
+        value = value.strip()
+        if value.lower() == 'no':  # All copies are available
+            return {i + 1: 'no' for i in range(num_copies)}
+        elif value.lower() == 'yes':  # All copies are loaned
+            return {i + 1: 'yes' for i in range(num_copies)}
+        else:
+            try:
+                # Try to evaluate the string as a dictionary
+                return eval(value)
+            except Exception as e:
+                raise ValueError(f"Unexpected is_loaned value: {value}") from e
+    elif isinstance(value, dict):
+        return value
+    else:
+        raise ValueError(f"Unexpected is_loaned value type: {type(value)}")
+
+
+
 def load_books_from_file(file_path="books.csv"):
-    """Load books from a CSV file into a DataFrame and initialize the DataManager."""
+    """
+    Load books from a CSV file into a DataFrame and initialize the DataManager.
+    """
     try:
+        # Load the CSV into a DataFrame
         books_df = pd.read_csv(file_path)
 
-        # Standardize `is_loaned` to lowercase for consistency
-        books_df['is_loaned'] = books_df['is_loaned'].apply(eval)
+        # Parse 'is_loaned' values and adjust based on 'copies'
+        books_df['is_loaned'] = books_df.apply(
+            lambda row: parse_is_loaned(row['is_loaned'], row['copies']),
+            axis=1
+        )
 
-        # Add `available` column based on `is_loaned`
+
+
+
+        # Add 'available' column based on 'is_loaned'
         books_df['available'] = books_df['is_loaned'].apply(
             lambda loaned_dict: sum(1 for status in loaned_dict.values() if status == 'no')
         )
-        books_df['borrow_count'] = books_df['copies'] - books_df['available']
 
-        # Calculate the size of the waiting list for each book
-        books_df['popularity_score'] = books_df['borrow_count'] + books_df['waiting_list'].apply(len)
-
-        # Add an empty `waiting_list` column if it doesn't exist
+        # Add 'waiting_list' column as empty lists if not exists
         if 'waiting_list' not in books_df.columns:
             books_df['waiting_list'] = [[] for _ in range(len(books_df))]
 
-        # Reorder columns for consistency
-        column_order = ['title', 'author', 'copies', 'available', 'is_loaned', 'waiting_list', 'category', 'year', 'borrow_count']
-        books_df = books_df[column_order]
+        # Add 'borrow_count' column as 0 if not exists
+        if 'borrow_count' not in books_df.columns:
+            books_df['borrow_count'] = 0
+
+        # Add 'popularity_score' column
+        books_df['popularity_score'] = books_df['borrow_count'] + books_df['waiting_list'].apply(len)
 
         # Initialize the DataManager with the DataFrame
         data_manager = DataManager.get_instance()
         data_manager.initialize_data(books_df)
+
+        print("Books loaded successfully.")
 
     except FileNotFoundError:
         print(f"Error: File not found at {file_path}")
@@ -58,7 +118,9 @@ def load_books_from_file(file_path="books.csv"):
         print(f"An error occurred: {e}")
 
 def save_books_to_file(file_path="books.csv"):
-    """Save the updated DataFrame from DataManager to a file."""
+    """
+    Save the updated DataFrame from DataManager to a file.
+    """
     try:
         # Get the DataFrame from DataManager
         data_manager = DataManager.get_instance()
@@ -71,26 +133,41 @@ def save_books_to_file(file_path="books.csv"):
         print(f"Error saving the updated DataFrame: {e}")
 
 def row_to_book(row):
-    """Convert a DataFrame row to a Book object."""
+    """
+    Convert a DataFrame row to a Book object.
+    """
     try:
+        # Ensure all required keys exist
+        required_keys = ['title', 'author', 'year', 'genre', 'copies', 'borrow_count', 'is_loaned', 'waiting_list']
+        for key in required_keys:
+            if key not in row:
+                raise KeyError(f"Missing key: {key}")
+
+        # Create the Book object
         book = Book(
             title=row['title'],
             author=row['author'],
             year=int(row['year']),
-            category=row['category'],
+            category=row.get('genre', 'Unknown'),  # Map 'genre' to 'category'
             copies=int(row['copies'])
         )
-        book.borrow_count = row['borrow_count']
-        book.is_loaned = row['is_loaned']
-        book.waiting_list = row['waiting_list']
+        book.borrow_count = row.get('borrow_count', 0)
+        book.is_loaned = row.get('is_loaned', {})
+        book.waiting_list = row.get('waiting_list', [])
         return book
+
     except KeyError as e:
         print(f"Missing key in the row: {e}")
+        return None
     except Exception as e:
         print(f"Error converting row to Book: {e}")
+        return None
+
 
 def update_book_in_dataframe(book):
-    """Update a row in the DataFrame managed by DataManager based on the Book object."""
+    """
+    Update a row in the DataFrame managed by DataManager based on the Book object.
+    """
     try:
         # Get the DataFrame from DataManager
         data_manager = DataManager.get_instance()
@@ -109,4 +186,3 @@ def update_book_in_dataframe(book):
         print(f"Error: Book '{book.title}' not found in the DataFrame.")
     except Exception as e:
         print(f"Error updating the DataFrame: {e}")
-
