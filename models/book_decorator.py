@@ -16,26 +16,26 @@ class BookDecorator:
         self.books_df = books_df.copy()
         if "borrow_count" not in self.books_df.columns:
             self.books_df["borrow_count"] = 0  # Add a column to track borrow counts
-
-    def get_borrow_count(self, book_id: int) -> int:
+    def get_borrow_count(self, title_book: str) -> int:
         """
         Gets the borrow count for a specific book by its ID.
 
         Args:
-            book_id (int): The ID of the book.
+            title_book (str): The name of the book.
 
         Returns:
             int: The borrow count for the specified book.
         """
-        if book_id in self.books_df["id"].values:
-            return int(self.books_df.loc[self.books_df["id"] == book_id, "borrow_count"].values[0])
+        if title_book in self.books_df["title"].values:
+            return int(self.books_df.loc[self.books_df["title"] == title_book, "borrow_count"].values[0])
         else:
-            print(f"Book ID {book_id} not found.")
+            print(f"Book name {title_book} not found.")
             return 0
 
-    def get_most_popular_books(self, top_n: int = 5) -> pd.DataFrame:
+    def get_most_popular_books(self, top_n: int = 10) -> pd.DataFrame:
         """
-        Returns the top N most popular books based on borrow count.
+        Returns the top N most popular books based on the popularity score.
+        Popularity score is calculated as the sum of borrow count and the size of the waiting list.
 
         Args:
             top_n (int): The number of top books to return.
@@ -43,7 +43,11 @@ class BookDecorator:
         Returns:
             pd.DataFrame: A DataFrame containing the top N most popular books.
         """
-        return self.books_df.sort_values(by="borrow_count", ascending=False).head(top_n)
+        # Sort by popularity_score in descending order
+        sorted_books = self.books_df.sort_values(by="popularity_score", ascending=False)
+
+        # Return the top N books
+        return sorted_books.head(top_n)
 
     def __str__(self):
         """

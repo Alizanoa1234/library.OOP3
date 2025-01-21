@@ -39,7 +39,7 @@ class LibraryManager:
             if existing_book.title == book.title and existing_book.author == book.author:
                 existing_book.copies += additional_copies
                 existing_book.available += additional_copies
-                save_books_to_file(self.books, self.file_path)
+                save_books_to_file(self.file_path)
                 log_info(f"Added {additional_copies} copies to '{existing_book.title}' by {existing_book.author}.")
                 self.notification_manager.notify_all(
                     f"{additional_copies} additional copies of '{existing_book.title}' by {existing_book.author} are now available."
@@ -48,7 +48,7 @@ class LibraryManager:
 
         self.books.append(book)
         self.decorators[(book.title, book.author)] = BookDecorator(book)
-        save_books_to_file(self.books, self.file_path)
+        save_books_to_file(self.file_path)
         log_info(f"New book '{book.title}' by {book.author} added successfully.")
         self.notification_manager.notify_all(f"New book added: '{book.title}' by {book.author}")
         return True
@@ -92,7 +92,7 @@ class LibraryManager:
                 if book.available > 0:
                     book.available -= 1
                     book.borrow_count += 1
-                    save_books_to_file(self.books, self.file_path)
+                    save_books_to_file(self.file_path)
                     log_info(f"Book '{title}' borrowed successfully.")
                     return True
                 else:

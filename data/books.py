@@ -1,119 +1,112 @@
 import pandas as pd
 from models.book import Book
-from data import dataManager  # Import the DataManager
 
-def load_books_to_dataframe(file_path: str) -> None:
-    """
-    Load books data from a CSV file, process the `is_loaned` column to store dictionaries
-    mapping copy numbers to loan statuses, and initialize the DataFrame in DataManager.
+class DataManager:
+    _instance = None
 
-    Args:
-        file_path (str): Path to the CSV file.
-    """
+    @staticmethod
+    def get_instance():
+        if DataManager._instance is None:
+            DataManager()
+        return DataManager._instance
+
+    def __init__(self):
+        if DataManager._instance is not None:
+            raise Exception("This class is a singleton!")
+        else:
+            self.data = None
+            DataManager._instance = self
+
+    def initialize_data(self, dataframe):
+        self.data = dataframe
+
+    def get_data(self):
+        return self.data
+
+def load_books_from_file(file_path="books.csv"):
+    """Load books from a CSV file into a DataFrame and initialize the DataManager."""
     try:
-        # Load the CSV file
-        df = pd.read_csv(file_path)
+        books_df = pd.read_csv(file_path)
 
         # Standardize `is_loaned` to lowercase for consistency
-        df['is_loaned'] = df['is_loaned'].str.lower()
+        books_df['is_loaned'] = books_df['is_loaned'].apply(eval)
 
-        # Process `is_loaned` into a dictionary mapping copy numbers to statuses
-        df['is_loaned'] = df.apply(
-            lambda row: {i + 1: row['is_loaned'] for i in range(row['copies'])},
-            axis=1
-        )
-
-        # Add `available` column based on the initial value of `is_loaned`
-        df['available'] = df['is_loaned'].apply(
+        # Add `available` column based on `is_loaned`
+        books_df['available'] = books_df['is_loaned'].apply(
             lambda loaned_dict: sum(1 for status in loaned_dict.values() if status == 'no')
         )
+        books_df['borrow_count'] = books_df['copies'] - books_df['available']
+
+        # Calculate the size of the waiting list for each book
+        books_df['popularity_score'] = books_df['borrow_count'] + books_df['waiting_list'].apply(len)
 
         # Add an empty `waiting_list` column if it doesn't exist
-        if 'waiting_list' not in df.columns:
-            df['waiting_list'] = [[] for _ in range(len(df))]
+        if 'waiting_list' not in books_df.columns:
+            books_df['waiting_list'] = [[] for _ in range(len(books_df))]
 
-        # Reorder columns to match the specified order
-        column_order = ['title', 'author', 'copies', 'available', 'is_loaned', 'waiting_list', 'genre', 'year']
-        df = df[column_order]
+        # Reorder columns for consistency
+        column_order = ['title', 'author', 'copies', 'available', 'is_loaned', 'waiting_list', 'category', 'year', 'borrow_count']
+        books_df = books_df[column_order]
 
         # Initialize the DataManager with the DataFrame
-        data_manager = dataManager.get_instance()
-        data_manager.initialize_data(df)
+        data_manager = DataManager.get_instance()
+        data_manager.initialize_data(books_df)
 
     except FileNotFoundError:
         print(f"Error: File not found at {file_path}")
     except Exception as e:
         print(f"An error occurred: {e}")
 
-
-def row_to_book(row: pd.Series) -> Book:
-    """
-    Convert a DataFrame row to a Book object.
-
-    Args:
-        row (pd.Series): A single row from the DataFrame.
-
-    Returns:
-        Book: A Book object created from the row data.
-    """
+def save_books_to_file(file_path="books.csv"):
+    """Save the updated DataFrame from DataManager to a file."""
     try:
-        # Create and return the Book object
+        # Get the DataFrame from DataManager
+        data_manager = DataManager.get_instance()
+        books_df = data_manager.get_data()
+
+        # Save the DataFrame to the file
+        books_df.to_csv(file_path, index=False)
+        print(f"All updated data successfully saved to {file_path}.")
+    except Exception as e:
+        print(f"Error saving the updated DataFrame: {e}")
+
+def row_to_book(row):
+    """Convert a DataFrame row to a Book object."""
+    try:
         book = Book(
-            title=row["title"],
-            author=row["author"],
-            category=row["genre"],
-            year=int(row["year"]),
-            copies=int(row["copies"]),
-            is_loaned_status=row["is_loaned"]  # Assuming it's already a dictionary
+            title=row['title'],
+            author=row['author'],
+            year=int(row['year']),
+            category=row['category'],
+            copies=int(row['copies'])
         )
+        book.borrow_count = row['borrow_count']
+        book.is_loaned = row['is_loaned']
+        book.waiting_list = row['waiting_list']
         return book
     except KeyError as e:
         print(f"Missing key in the row: {e}")
     except Exception as e:
         print(f"Error converting row to Book: {e}")
 
-
-def update_book_in_dataframe(book: Book) -> None:
-    """
-    Update a row in the DataFrame managed by DataManager based on the data in the Book object.
-
-    Args:
-        book (Book): The Book object with updated data.
-    """
+def update_book_in_dataframe(book):
+    """Update a row in the DataFrame managed by DataManager based on the Book object."""
     try:
         # Get the DataFrame from DataManager
-        data_manager = dataManager.get_instance()
-        df = data_manager.get_data()
+        data_manager = DataManager.get_instance()
+        books_df = data_manager.get_data()
 
         # Locate the row to update
-        row_index = df[df['title'] == book.title].index[0]
+        row_index = books_df[books_df['title'] == book.title].index[0]
 
         # Update the row with data from the Book object
-        df.at[row_index, 'is_loaned'] = book.is_loaned  # Keep it as a dictionary
-        df.at[row_index, 'available'] = book.available
-        df.at[row_index, 'copies'] = book.copies
-        df.at[row_index, 'waiting_list'] = book.waiting_list
+        books_df.at[row_index, 'is_loaned'] = book.is_loaned
+        books_df.at[row_index, 'available'] = sum(1 for status in book.is_loaned.values() if status == 'no')
+        books_df.at[row_index, 'copies'] = book.copies
+        books_df.at[row_index, 'waiting_list'] = book.waiting_list
 
     except IndexError:
         print(f"Error: Book '{book.title}' not found in the DataFrame.")
     except Exception as e:
         print(f"Error updating the DataFrame: {e}")
 
-
-def save_updated_dataframe(file_path: str) -> None:
-    """
-    Save the updated DataFrame managed by DataManager to a file.
-
-    Args:
-        file_path (str): The path to the file where the DataFrame should be saved.
-    """
-    try:
-        # Get the DataFrame from DataManager
-        data_manager = DataManager.get_instance()
-        df = data_manager.get_data()
-
-        # Save the entire DataFrame to the file
-        df.to_csv(file_path, index=False)
-        print(f"All updated data successfully saved to {file_path}.")
-    except Exception as e:
-        print(f"Error saving the updated DataFrame: {e}")

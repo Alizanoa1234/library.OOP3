@@ -24,6 +24,8 @@ class Book:
         self.available = sum(1 for status in self.is_loaned.values() if status == "no")
         self.borrow_count = 0  # Number of times the book has been borrowed
         self.waiting_list = []  # List of users waiting for the book
+        # Calculate the size of the waiting list for each book
+        self.popularity_score = 0
 
     def __str__(self):
         return (f"Title: {self.title}, Author: {self.author}, Copies: {self.copies}, "
