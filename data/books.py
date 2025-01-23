@@ -63,11 +63,16 @@ def parse_is_loaned(value, num_copies):
         else:
             try:
                 # Try to evaluate the string as a dictionary
-                return eval(value)
+                parsed_dict = eval(value)
+                return {
+                    i + 1: parsed_dict.get(i + 1, 'no') for i in range(num_copies)
+                }
             except Exception as e:
                 raise ValueError(f"Unexpected is_loaned value: {value}") from e
     elif isinstance(value, dict):
-        return value
+        return {
+         i + 1: value.get(i + 1, 'no') for i in range(num_copies)
+         }
     else:
         raise ValueError(f"Unexpected is_loaned value type: {type(value)}")
 
@@ -182,6 +187,7 @@ def update_book_in_dataframe(book):
         books_df.at[row_index, 'waiting_list'] = book.waiting_list
         books_df.at[row_index, 'borrow_count'] = book.borrow_count
         books_df.at[row_index, 'popularity_score'] = book.popularity_score
+
 
     except IndexError:
         print(f"Error: Book '{book.title}' not found in the DataFrame.")

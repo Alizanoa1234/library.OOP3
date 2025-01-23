@@ -4,6 +4,8 @@ import pandas as pd
 from data.books import load_books_from_file, save_books_to_file, update_book_in_dataframe
 from models.book import Book
 from data.books import DataManager
+from werkzeug.security import check_password_hash
+
 
 def main():
     pd.set_option('display.max_colwidth', None)
@@ -12,7 +14,7 @@ def main():
     pd.set_option('display.expand_frame_repr', False)
 
     # Step 1: Load books into DataManager
-    file_path = "books.csv"
+    file_path = "data/books.csv"
     print("=== Step 1: Loading Books ===")
     load_books_from_file(file_path)
 
@@ -20,11 +22,14 @@ def main():
     data_manager = DataManager.get_instance()
     books_df = data_manager.get_data()
 
-    if books_df is not None and not books_df.empty:
-        print("\nLoaded DataFrame:")
-        print(books_df)
+    print(f"CSV file path: {self.csv_file}")
 
-    save_books_to_file(file_path)
+    #
+    # if books_df is not None and not books_df.empty:
+    #     print("\nLoaded DataFrame:")
+    #     print(books_df)
+    #
+    # save_books_to_file(file_path)
 
     #
     #     # Step 3: Select a book to update
@@ -59,6 +64,19 @@ def main():
     #
     # else:
     #     print("DataFrame is empty or not initialized.")
+
+    # stored_password = "scrypt:32768:8:1$u1aprgqcsWsPhnJJ$61b391f60a1700a7d660ca94d3feff9e298f4bed0512436f5c378b385b603e7f306c12398c61481f3e9750d37b1f575c735c18c41cce6b23141881b2ccfdc378"
+    # entered_password = "abc123"
+    #
+    # if check_password_hash(stored_password, entered_password):
+    #     print("Password matches!")
+    # else:
+    #     print("Password does not match!")
+    #
+    # users_file = "data/users.csv"
+    # df = pd.read_csv(users_file)
+    # print(df)
+
 
 if __name__ == "__main__":
     main()
