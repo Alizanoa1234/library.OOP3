@@ -2,6 +2,7 @@ from data.books import load_books_from_file, save_books_to_file
 from models.book import Book
 from models.book_decorator import BookDecorator
 from models.search_strategy import SearchManager, SearchByName, SearchByAuthor, SearchByCategory, SearchByYear
+from services.auth_manager import AuthManager
 from services.notification_manager import NotificationManager
 from logs.actions import log_info, log_error
 
@@ -24,8 +25,9 @@ class LibraryManager:
         self.file_path = file_path  # Path to the original books.csv file
         self.books = load_books_from_file(self.file_path)  # Load books from the original CSV
         self.decorators = {(book.title, book.author): BookDecorator(book) for book in self.books}  # Decorate books
-        self.notification_manager = NotificationManager()
-
+        auth_manager = AuthManager("data/users.csv")
+        users = auth_manager.users_file  # Get the users list as a dictionary
+        self.notification_manager = NotificationManager(users)
     def add_book(self, book: Book, additional_copies: int = 0) -> bool:
         """
         Adds a new book to the library or increases the number of copies if the book already exists.

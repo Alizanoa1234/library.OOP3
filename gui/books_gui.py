@@ -1,93 +1,101 @@
 import tkinter as tk
-from tkinter import messagebox
-from services.library_manager import LibraryManager
+import pandas as pd
 from logs.actions import log_info, log_error
+from data.books import load_books_from_file, save_books_to_file
 
-class BooksGUI:
-    def __init__(self, root):
-        self.root = tk.Toplevel(root)
-        self.root.title("Books Management")
-        self.library_manager = LibraryManager("data/books.csv")
-        self.create_books_menu()
+BOOKS_FILE = "books.csv"
 
-    def create_books_menu(self):
-        tk.Label(self.root, text="Manage Books", font=("Helvetica", 16)).pack(pady=20)
+def open_books_gui(action):
+    """Handles the Books Management GUI."""
+    books_df = load_books_from_file(BOOKS_FILE)
 
-        buttons = [
-            ("Add Book", self.add_book_screen),
-            ("Remove Book", self.remove_book_screen),
-            ("View Books", self.view_books_screen),
-            ("Back", self.root.destroy)
-        ]
+    def add_book():
+        title = title_entry.get().strip()
+        author = author_entry.get().strip()
+        if not title or not author:
+            result_label.config(text="Title and Author are required!", fg="red")
+            return
 
-        for text, command in buttons:
-            tk.Button(self.root, text=text, width=20, command=command).pack(pady=10)
+        if not books_df[(books_df['title'] == title) & (books_df['author'] == author)].empty:
+            result_label.config(text="Book already exists!", fg="red")
+            log_error(f"Failed to add book '{title}' by '{author}': Already exists.")
+            return
 
-    def add_book_screen(self):
-        self.clear_screen()
-        tk.Label(self.root, text="Add Book", font=("Helvetica", 14)).pack(pady=10)
-        entries = {}
-        for label in ["Title", "Author", "Year", "Category", "Copies"]:
-            tk.Label(self.root, text=label).pack()
-            entry = tk.Entry(self.root)
-            entry.pack()
-            entries[label.lower()] = entry
+        new_book = pd.DataFrame([{
+            "title": title,
+            "author": author,
+            "is_loaned": "No",
+            "copies": 1,
+            "genre": "Unknown",
+            "year": "Unknown"
+        }])
+        save_books_to_file(pd.concat([books_df, new_book], ignore_index=True))
+        result_label.config(text="Book added successfully!", fg="green")
+        log_info(f"Book '{title}' by '{author}' added successfully.")
 
-        def submit():
-            try:
-                from models.book import Book
-                book = Book(
-                    title=entries["title"].get(),
-                    author=entries["author"].get(),
-                    year=int(entries["year"].get()),
-                    category=entries["category"].get(),
-                    copies=int(entries["copies"].get())
-                )
-                if self.library_manager.add_book(book):
-                    log_info(f"Book '{book.title}' added successfully.")
-                    messagebox.showinfo("Success", "Book added successfully!")
-                else:
-                    log_error(f"Failed to add book '{book.title}'.")
-                    messagebox.showerror("Error", "Failed to add book.")
-            except Exception as e:
-                log_error(f"Error adding book: {e}")
-                messagebox.showerror("Error", str(e))
+    def remove_book():
+        title = title_entry.get().strip()
+        author = author_entry.get().strip()
+        mask = (books_df["title"] == title) & (books_df["author"] == author)
+        if books_df[mask].empty:
+            result_label.config(text="Book not found!", fg="red")
+            log_error(f"Failed to remove book '{title}' by '{author}': Not found.")
+            return
 
-        tk.Button(self.root, text="Add", command=submit).pack(pady=5)
-        tk.Button(self.root, text="Back", command=self.create_books_menu).pack(pady=5)
+        books_df.drop(books_df[mask].index, inplace=True)
+        save_books_to_file(books_df)
+        result_label.config(text="Book removed successfully!", fg="green")
+        log_info(f"Book '{title}' by '{author}' removed successfully.")
 
-    def remove_book_screen(self):
-        self.clear_screen()
-        tk.Label(self.root, text="Remove Book", font=("Helvetica", 14)).pack(pady=10)
-        title_entry = tk.Entry(self.root)
-        tk.Label(self.root, text="Title").pack()
+    def view_books():
+        result_text.delete(1.0, tk.END)
+        try:
+            for _, book in books_df.iterrows():
+                result_text.insert(tk.END, f"{book['title']} by {book['author']} (Genre: {book['genre']})\n")
+            log_info("Displayed all books successfully.")
+        except Exception as e:
+            result_label.config(text=f"Error displaying books: {e}", fg="red")
+
+    def popular_books():
+        result_text.delete(1.0, tk.END)
+        try:
+            popular_books_df = books_df.sort_values("copies", ascending=False).head(10)
+            for _, book in popular_books_df.iterrows():
+                result_text.insert(tk.END, f"{book['title']} by {book['author']} (Copies: {book['copies']})\n")
+            log_info("Displayed popular books successfully.")
+        except Exception as e:
+            result_label.config(text=f"Error displaying popular books: {e}", fg="red")
+
+    # GUI window
+    window = tk.Toplevel()
+    window.title("Books Management")
+
+    tk.Label(window, text=f"Action: {action.capitalize()}", font=("Arial", 16, "bold")).pack(pady=10)
+
+    if action in ["add", "remove"]:
+        tk.Label(window, text="Title").pack()
+        title_entry = tk.Entry(window)
         title_entry.pack()
-        author_entry = tk.Entry(self.root)
-        tk.Label(self.root, text="Author").pack()
+
+        tk.Label(window, text="Author").pack()
+        author_entry = tk.Entry(window)
         author_entry.pack()
 
-        def submit():
-            if self.library_manager.remove_book(title_entry.get(), author_entry.get()):
-                log_info(f"Book '{title_entry.get()}' removed successfully.")
-                messagebox.showinfo("Success", "Book removed successfully!")
-            else:
-                log_error(f"Failed to remove book '{title_entry.get()}'.")
-                messagebox.showerror("Error", "Failed to remove book.")
+        if action == "add":
+            tk.Button(window, text="Add Book", command=add_book).pack(pady=5)
+        elif action == "remove":
+            tk.Button(window, text="Remove Book", command=remove_book).pack(pady=5)
 
-        tk.Button(self.root, text="Remove", command=submit).pack(pady=5)
-        tk.Button(self.root, text="Back", command=self.create_books_menu).pack(pady=5)
+    elif action == "view":
+        tk.Button(window, text="View All Books", command=view_books).pack(pady=5)
 
-    def view_books_screen(self):
-        self.clear_screen()
-        books = self.library_manager.get_all_books()
-        tk.Label(self.root, text="Books", font=("Helvetica", 14)).pack(pady=10)
-        text = tk.Text(self.root)
-        text.pack()
-        for book in books:
-            text.insert("end", f"{book}\n")
+    elif action == "popular":
+        tk.Button(window, text="View Popular Books", command=popular_books).pack(pady=5)
 
-        tk.Button(self.root, text="Back", command=self.create_books_menu).pack(pady=5)
+    result_label = tk.Label(window, text="", font=("Arial", 12))
+    result_label.pack()
 
-    def clear_screen(self):
-        for widget in self.root.winfo_children():
-            widget.destroy()
+    result_text = tk.Text(window, height=20, width=50)
+    result_text.pack()
+
+    window.mainloop()

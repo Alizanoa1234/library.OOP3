@@ -6,7 +6,7 @@ class NotificationManager:
     Handles notifications to all users when events occur in the library system.
     """
 
-    def __init__(self, users: list):
+    def __init__(self, users: str):
         """
         Initializes the NotificationManager with a list of users.
 
@@ -37,3 +37,4 @@ class NotificationManager:
         # Simulate sending an email or other notification
         print(f"Notification sent to {user['name']} ({user['email']}): {message}")
         log_info(f"Notification sent to {user['name']} ({user['email']}): {message}")
+

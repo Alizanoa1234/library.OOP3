@@ -1,3 +1,5 @@
+import os
+import pandas as pd
 from werkzeug.security import generate_password_hash, check_password_hash
 import pandas as pd
 from models.user import User
@@ -8,7 +10,9 @@ class AuthManager:
         """
         Initialize the AuthManager, ensuring the users file exists.
         """
-        self.users_file = users_file
+        # הפיכת הנתיב לנתיב מוחלט
+        base_dir = os.path.dirname(os.path.abspath(__file__))  # ספריית services
+        self.users_file = os.path.join(base_dir, "..", users_file)  # קובץ users.csv בנתיב מוחלט
         self.current_user = None
         self._initialize_users_file()
 
@@ -17,6 +21,14 @@ class AuthManager:
         Ensures that the users.csv file exists with proper headers.
         If the file does not exist or is malformed, it creates it with default headers.
         """
+        directory = os.path.dirname(self.users_file)
+
+        # יצירת ספריית 'data' במידת הצורך
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+            log_info(f"Directory '{directory}' was created.")
+
+        # בדיקה אם הקובץ users.csv קיים ותקין
         try:
             df = pd.read_csv(self.users_file)
             if not {'username', 'password'}.issubset(df.columns):

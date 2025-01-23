@@ -1,39 +1,28 @@
 import tkinter as tk
-from books_gui import BooksGUI
-from search_gui import SearchGUI
-from services.library_manager import LibraryManager
-from user_gui import UserGUI
+from books_gui import open_books_gui
+from search_gui import open_search_gui
+from user_gui import open_user_gui
 from logs.actions import log_info
 
-class MainGUI:
-    def __init__(self):
-        self.root = tk.Tk()
-        self.root.title("Library Management System")
-        self.library_manager = LibraryManager("books.csv")
-        self.root.geometry("400x400")
-        self.create_main_menu()
+def main_gui():
+    root = tk.Tk()
+    root.title("Library Management System")
 
-    def create_main_menu(self):
-        tk.Label(self.root, text="Library Management System", font=("Helvetica", 16)).pack(pady=20)
+    tk.Label(root, text="Library Management System", font=("Arial", 18, "bold")).pack(pady=10)
 
-        buttons = [
-            ("Manage Books", lambda: BooksGUI(self.root)),
-            ("Search Books", lambda: SearchGUI(self.root, library_manager=self.library_manager)),
-            ("User Management", lambda: UserGUI(self.root)),
-            ("Exit", self.exit_application)
-        ]
+    # Buttons for different functionalities
+    tk.Button(root, text="Add Book", command=lambda: open_books_gui("add")).pack(pady=5)
+    tk.Button(root, text="Remove Book", command=lambda: open_books_gui("remove")).pack(pady=5)
+    tk.Button(root, text="Search Book", command=open_search_gui).pack(pady=5)
+    tk.Button(root, text="View Books", command=lambda: open_books_gui("view")).pack(pady=5)
+    tk.Button(root, text="Lend Book", command=lambda: open_books_gui("lend")).pack(pady=5)
+    tk.Button(root, text="Return Book", command=lambda: open_books_gui("return")).pack(pady=5)
+    tk.Button(root, text="Login", command=lambda: open_user_gui("login")).pack(pady=5)
+    tk.Button(root, text="Register", command=lambda: open_user_gui("register")).pack(pady=5)
+    tk.Button(root, text="Popular Books", command=lambda: open_books_gui("popular")).pack(pady=5)
+    tk.Button(root, text="Logout", command=lambda: log_info("User logged out successfully.")).pack(pady=5)
 
-        for text, command in buttons:
-            tk.Button(self.root, text=text, width=20, command=command).pack(pady=10)
-
-    def exit_application(self):
-        log_info("Application exited successfully.")
-        self.root.destroy()
-
-    def run(self):
-        self.root.mainloop()
-
+    root.mainloop()
 
 if __name__ == "__main__":
-    app = MainGUI()
-    app.run()
+    main_gui()
