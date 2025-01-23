@@ -2,6 +2,8 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 from io import StringIO
+from tkinter import Text
+
 
 # Define a centralized log file path
 LOG_FILE_PATH = "logs/actions.log"
@@ -73,3 +75,18 @@ def get_gui_log():
         str: The accumulated log messages.
     """
     return log_buffer.getvalue()
+
+
+class TkinterLogHandler(logging.Handler):
+    """
+    Custom log handler to send log messages to a Tkinter Text widget.
+    """
+    def __init__(self, text_widget: Text):
+        super().__init__()
+        self.text_widget = text_widget
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.text_widget.insert("end", log_entry + "\n")
+        self.text_widget.see("end")  # Automatically scroll to the end
+

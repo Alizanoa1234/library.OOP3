@@ -1,101 +1,122 @@
 import tkinter as tk
 import pandas as pd
-from logs.actions import log_info, log_error
 from data.books import load_books_from_file, save_books_to_file
+from logs.actions import log_info, log_error
 
 BOOKS_FILE = "books.csv"
 
-def open_books_gui(action):
-    """Handles the Books Management GUI."""
-    books_df = load_books_from_file(BOOKS_FILE)
+def open_books_gui(log_text, action):
+    # Load books from the CSV file
+    try:
+        books_df = load_books_from_file(BOOKS_FILE)
+    except Exception as e:
+        log_error(f"Error loading books file: {e}")
+        log_text.insert("end", f"Error: Could not load books file.\n")
+        return
 
-    def add_book():
-        title = title_entry.get().strip()
-        author = author_entry.get().strip()
-        if not title or not author:
-            result_label.config(text="Title and Author are required!", fg="red")
-            return
-
-        if not books_df[(books_df['title'] == title) & (books_df['author'] == author)].empty:
-            result_label.config(text="Book already exists!", fg="red")
-            log_error(f"Failed to add book '{title}' by '{author}': Already exists.")
-            return
-
-        new_book = pd.DataFrame([{
-            "title": title,
-            "author": author,
-            "is_loaned": "No",
-            "copies": 1,
-            "genre": "Unknown",
-            "year": "Unknown"
-        }])
-        save_books_to_file(pd.concat([books_df, new_book], ignore_index=True))
-        result_label.config(text="Book added successfully!", fg="green")
-        log_info(f"Book '{title}' by '{author}' added successfully.")
-
-    def remove_book():
-        title = title_entry.get().strip()
-        author = author_entry.get().strip()
-        mask = (books_df["title"] == title) & (books_df["author"] == author)
-        if books_df[mask].empty:
-            result_label.config(text="Book not found!", fg="red")
-            log_error(f"Failed to remove book '{title}' by '{author}': Not found.")
-            return
-
-        books_df.drop(books_df[mask].index, inplace=True)
-        save_books_to_file(books_df)
-        result_label.config(text="Book removed successfully!", fg="green")
-        log_info(f"Book '{title}' by '{author}' removed successfully.")
-
-    def view_books():
-        result_text.delete(1.0, tk.END)
-        try:
-            for _, book in books_df.iterrows():
-                result_text.insert(tk.END, f"{book['title']} by {book['author']} (Genre: {book['genre']})\n")
-            log_info("Displayed all books successfully.")
-        except Exception as e:
-            result_label.config(text=f"Error displaying books: {e}", fg="red")
-
-    def popular_books():
-        result_text.delete(1.0, tk.END)
-        try:
-            popular_books_df = books_df.sort_values("copies", ascending=False).head(10)
-            for _, book in popular_books_df.iterrows():
-                result_text.insert(tk.END, f"{book['title']} by {book['author']} (Copies: {book['copies']})\n")
-            log_info("Displayed popular books successfully.")
-        except Exception as e:
-            result_label.config(text=f"Error displaying popular books: {e}", fg="red")
-
-    # GUI window
     window = tk.Toplevel()
-    window.title("Books Management")
+    window.title(f"{action.capitalize()} Book")
 
-    tk.Label(window, text=f"Action: {action.capitalize()}", font=("Arial", 16, "bold")).pack(pady=10)
+    tk.Label(window, text="Title").pack()
+    title_entry = tk.Entry(window)
+    title_entry.pack()
 
-    if action in ["add", "remove"]:
-        tk.Label(window, text="Title").pack()
-        title_entry = tk.Entry(window)
-        title_entry.pack()
+    tk.Label(window, text="Author").pack()
+    author_entry = tk.Entry(window)
+    author_entry.pack()
 
-        tk.Label(window, text="Author").pack()
-        author_entry = tk.Entry(window)
-        author_entry.pack()
+    # Additional fields for adding books
+    if action == "add":
+        tk.Label(window, text="Category").pack()
+        category_entry = tk.Entry(window)
+        category_entry.pack()
 
-        if action == "add":
-            tk.Button(window, text="Add Book", command=add_book).pack(pady=5)
-        elif action == "remove":
-            tk.Button(window, text="Remove Book", command=remove_book).pack(pady=5)
+        tk.Label(window, text="Year").pack()
+        year_entry = tk.Entry(window)
+        year_entry.pack()
 
-    elif action == "view":
-        tk.Button(window, text="View All Books", command=view_books).pack(pady=5)
+        tk.Label(window, text="Copies").pack()
+        copies_entry = tk.Entry(window)
+        copies_entry.pack()
 
-    elif action == "popular":
-        tk.Button(window, text="View Popular Books", command=popular_books).pack(pady=5)
-
-    result_label = tk.Label(window, text="", font=("Arial", 12))
+    result_label = tk.Label(window, text="")
     result_label.pack()
 
-    result_text = tk.Text(window, height=20, width=50)
-    result_text.pack()
+    def handle_action():
+        title = title_entry.get().strip()
+        author = author_entry.get().strip()
 
-    window.mainloop()
+        if not title or not author:
+            result_label.config(text="Title and author are required!", fg="red")
+            return
+
+        if action == "add":
+            category = category_entry.get().strip()
+            year = year_entry.get().strip()
+            copies = copies_entry.get().strip()
+
+            if not category or not year or not copies:
+                result_label.config(text="All fields are required for adding a book!", fg="red")
+                return
+
+            # Add a new book to the DataFrame
+            new_book = pd.DataFrame({
+                "title": [title],
+                "author": [author],
+                "genre": [category],
+                "year": [int(year)],
+                "copies": [int(copies)],
+                "is_loaned": ["{}"],
+                "borrow_count": [0],
+                "waiting_list": ["[]"],
+                "available": [int(copies)],
+                "popularity_score": [0]
+            })
+            global books_df
+            books_df = pd.concat([books_df, new_book], ignore_index=True)
+            save_books_to_file(books_df, BOOKS_FILE)
+            log_info(f"Book '{title}' added successfully.")
+            log_text.insert("end", f"Book '{title}' added successfully.\n")
+            result_label.config(text="Book added successfully!", fg="green")
+
+        elif action == "remove":
+            book_index = books_df[(books_df["title"] == title) & (books_df["author"] == author)].index
+            if not book_index.empty:
+                books_df.drop(book_index, inplace=True)
+                save_books_to_file(books_df, BOOKS_FILE)
+                log_info(f"Book '{title}' removed successfully.")
+                log_text.insert("end", f"Book '{title}' removed successfully.\n")
+                result_label.config(text="Book removed successfully!", fg="green")
+            else:
+                log_error(f"Book '{title}' by {author} not found.")
+                log_text.insert("end", f"Book '{title}' not found.\n")
+                result_label.config(text="Book not found!", fg="red")
+
+        elif action == "lend":
+            book = books_df[(books_df["title"] == title) & (books_df["author"] == author)]
+            if not book.empty and book.iloc[0]["available"] > 0:
+                books_df.loc[book.index, "available"] -= 1
+                books_df.loc[book.index, "borrow_count"] += 1
+                save_books_to_file(books_df, BOOKS_FILE)
+                log_info(f"Book '{title}' lent successfully.")
+                log_text.insert("end", f"Book '{title}' lent successfully.\n")
+                result_label.config(text="Book lent successfully!", fg="green")
+            else:
+                log_error(f"Book '{title}' unavailable for lending.")
+                log_text.insert("end", f"Book '{title}' unavailable.\n")
+                result_label.config(text="Book unavailable!", fg="red")
+
+        elif action == "return":
+            book = books_df[(books_df["title"] == title) & (books_df["author"] == author)]
+            if not book.empty:
+                books_df.loc[book.index, "available"] += 1
+                save_books_to_file(books_df, BOOKS_FILE)
+                log_info(f"Book '{title}' returned successfully.")
+                log_text.insert("end", f"Book '{title}' returned successfully.\n")
+                result_label.config(text="Book returned successfully!", fg="green")
+            else:
+                log_error(f"Book '{title}' not found for returning.")
+                log_text.insert("end", f"Book '{title}' not found.\n")
+                result_label.config(text="Book not found!", fg="red")
+
+    tk.Button(window, text=action.capitalize() + " Book", command=handle_action).pack(pady=10)

@@ -1,48 +1,66 @@
 import tkinter as tk
-from logs.actions import log_info
 from data.books import load_books_from_file
 from models.search_strategy import SearchManager, SearchByName, SearchByAuthor
+from logs.actions import log_info, log_error
 
 BOOKS_FILE = "books.csv"
-books_df = load_books_from_file(BOOKS_FILE)
 
-def open_search_gui():
-    """Search Books GUI."""
-    search_manager = SearchManager(SearchByName())
 
-    def search_by_name():
-        query = search_entry.get().strip()
-        results = search_manager.search(books_df, query)
-        display_results(results, f"Search by name '{query}'")
+def open_search_gui(log_text, search_type):
+    try:
+        books_df = load_books_from_file(BOOKS_FILE)
+    except Exception as e:
+        log_error(f"Error loading books file: {e}")
+        log_text.insert("end", "Error: Could not load books file.\n")
+        return
 
-    def search_by_author():
-        query = search_entry.get().strip()
-        search_manager.set_strategy(SearchByAuthor())
-        results = search_manager.search(books_df, query)
-        display_results(results, f"Search by author '{query}'")
-
-    def display_results(results, log_message):
-        result_text.delete(1.0, tk.END)
-        if results.empty:
-            result_text.insert(tk.END, "No results found.\n")
-            log_info(f"{log_message} failed.")
-        else:
-            for _, book in results.iterrows():
-                result_text.insert(tk.END, f"{book['title']} by {book['author']}\n")
-            log_info(f"{log_message} succeeded.")
-
-    # GUI window
     window = tk.Toplevel()
-    window.title("Search Books")
+    window.title(f"{search_type.capitalize()} Books")
 
-    tk.Label(window, text="Search Query").pack()
-    search_entry = tk.Entry(window)
-    search_entry.pack()
+    tk.Label(window, text="Enter Search Query (if applicable):").pack()
+    query_entry = tk.Entry(window)
+    query_entry.pack()
 
-    tk.Button(window, text="Search by Name", command=search_by_name).pack(pady=5)
-    tk.Button(window, text="Search by Author", command=search_by_author).pack(pady=5)
+    result_text = tk.Text(window, wrap="word", height=15, width=50, state="normal")
+    result_text.pack(pady=10)
 
-    result_text = tk.Text(window, height=20, width=50)
-    result_text.pack()
+    def handle_search():
+        query = query_entry.get().strip()
+        if not query and search_type in ["search", "popular"]:
+            result_text.insert("end", "Error: Query is required for this search.\n", "error")
+            return
 
-    window.mainloop()
+        try:
+            search_manager = SearchManager(SearchByName()) if search_type == "search" else None
+            if search_type == "search":
+                search_manager.set_strategy(SearchByName())
+                results = search_manager.search(books_df, query)
+                log_info(f"Search by name completed for '{query}'.")
+
+            elif search_type == "author":
+                search_manager.set_strategy(SearchByAuthor())
+                results = search_manager.search(books_df, query)
+                log_info(f"Search by author completed for '{query}'.")
+
+            elif search_type == "view":
+                results = books_df
+                log_info("Displayed all books successfully.")
+
+            elif search_type == "popular":
+                results = books_df.sort_values(by="popularity_score", ascending=False).head(10)
+                log_info("Displayed popular books successfully.")
+
+            if not results.empty:
+                result_text.delete("1.0", "end")
+                result_text.insert("end", results.to_string(index=False) + "\n")
+                log_text.insert("end", f"{search_type.capitalize()} successful.\n")
+            else:
+                result_text.delete("1.0", "end")
+                result_text.insert("end", "No results found.\n")
+                log_text.insert("end", f"No results found for {search_type}.\n")
+        except Exception as e:
+            log_error(f"Error in {search_type}: {e}")
+            log_text.insert("end", f"Error during {search_type}: {e}\n")
+
+    tk.Button(window, text="Search", command=handle_search).pack(pady=10)
+    tk.Button(window, text="Close", command=window.destroy).pack(pady=5)
