@@ -50,6 +50,9 @@ class LibraryManager:
 
         book.is_loaned = {i + 1: 'no' for i in range(book.copies)}
         book.available = book.copies
+        book.borrow_count = 0
+        book.popularity_score = book.borrow_count + len(book.waiting_list)
+        book.waiting_list = []
         self.books.append(book)
 
         self.decorators[(book.title, book.author)] = BookDecorator(book)
