@@ -87,9 +87,6 @@ def load_books_from_file(file_path="books.csv"):
             axis=1
         )
 
-
-
-
         # Add 'available' column based on 'is_loaned'
         books_df['available'] = books_df['is_loaned'].apply(
             lambda loaned_dict: sum(1 for status in loaned_dict.values() if status == 'no')
@@ -99,9 +96,11 @@ def load_books_from_file(file_path="books.csv"):
         if 'waiting_list' not in books_df.columns:
             books_df['waiting_list'] = [[] for _ in range(len(books_df))]
 
-        # Add 'borrow_count' column as 0 if not exists
-        if 'borrow_count' not in books_df.columns:
-            books_df['borrow_count'] = 0
+
+        # Calculate 'borrow_count' based on 'is_loaned'
+        books_df['borrow_count'] = books_df['is_loaned'].apply(
+            lambda loaned_dict: sum(1 for status in loaned_dict.values() if status == 'yes')
+        )
 
         # Add 'popularity_score' column
         books_df['popularity_score'] = books_df['borrow_count'] + books_df['waiting_list'].apply(len)
@@ -181,6 +180,8 @@ def update_book_in_dataframe(book):
         books_df.at[row_index, 'available'] = sum(1 for status in book.is_loaned.values() if status == 'no')
         books_df.at[row_index, 'copies'] = book.copies
         books_df.at[row_index, 'waiting_list'] = book.waiting_list
+        books_df.at[row_index, 'borrow_count'] = book.borrow_count
+        books_df.at[row_index, 'popularity_score'] = book.popularity_score
 
     except IndexError:
         print(f"Error: Book '{book.title}' not found in the DataFrame.")
