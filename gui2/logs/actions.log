@@ -1,0 +1,209 @@
+2025-01-23 21:13:38 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:13:58 - ERROR - Password must be at least 6 characters long.
+2025-01-23 21:14:04 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:15:02 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:15:09 - ERROR - Authentication failed for librarian 'a': Incorrect password.
+2025-01-23 21:15:09 - ERROR - Failed login attempt for user 'a'.
+2025-01-23 21:16:07 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:16:11 - ERROR - Authentication failed for librarian 's': Username not found.
+2025-01-23 21:16:11 - ERROR - Failed login attempt for user 's'.
+2025-01-23 21:17:24 - ERROR - Password must be at least 6 characters long.
+2025-01-23 21:17:24 - ERROR - Registration failed for user 'acb': Invalid username or password
+2025-01-23 21:18:43 - INFO - Librarian 'acb123' registered successfully.
+2025-01-23 21:18:43 - INFO - User 'acb123' registered successfully.
+2025-01-23 21:19:42 - ERROR - Authentication failed for librarian 'abc123': Username not found.
+2025-01-23 21:19:42 - ERROR - Failed login attempt for user 'abc123'.
+2025-01-23 21:19:57 - ERROR - Authentication failed for librarian 'abc123': Username not found.
+2025-01-23 21:19:57 - ERROR - Failed login attempt for user 'abc123'.
+2025-01-23 21:22:59 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:23:05 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:23:15 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:23:47 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:24:22 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:24:57 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:25:10 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:26:31 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:27:25 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:29:06 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:29:23 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 21:29:57 - INFO - Librarian 'aaaa123' registered successfully.
+2025-01-23 21:29:57 - INFO - User 'aaaa123' registered successfully.
+2025-01-23 21:30:07 - ERROR - Authentication failed for librarian 'aaaa123': Incorrect password.
+2025-01-23 21:30:07 - ERROR - Failed login attempt for user 'aaaa123'.
+2025-01-23 22:57:53 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 22:58:04 - ERROR - Authentication failed for librarian 'aaaa123': Incorrect password.
+2025-01-23 22:58:04 - ERROR - Error authenticating librarian 'aaaa123': Incorrect password.
+2025-01-23 22:58:42 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 22:58:46 - ERROR - Authentication failed for librarian 'dd': Username not found.
+2025-01-23 22:58:46 - ERROR - Failed login attempt for user 'dd'.
+2025-01-23 22:59:52 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 22:59:59 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:01:55 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:02:09 - ERROR - Authentication failed for librarian 'abc123': Username not found.
+2025-01-23 23:02:09 - ERROR - Error authenticating librarian 'abc123': Username not found.
+2025-01-23 23:02:18 - ERROR - Authentication failed for librarian 'aaaa123': Incorrect password.
+2025-01-23 23:02:18 - ERROR - Error authenticating librarian 'aaaa123': Incorrect password.
+2025-01-23 23:02:23 - ERROR - Authentication failed for librarian 'aaaa123': Incorrect password.
+2025-01-23 23:02:23 - ERROR - Error authenticating librarian 'aaaa123': Incorrect password.
+2025-01-23 23:02:28 - ERROR - Authentication failed for librarian 'aaaa123': Incorrect password.
+2025-01-23 23:02:28 - ERROR - Error authenticating librarian 'aaaa123': Incorrect password.
+2025-01-23 23:08:14 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:08:37 - ERROR - Authentication failed for librarian 'abc123': Username not found.
+2025-01-23 23:08:37 - ERROR - Error authenticating librarian 'abc123': Username not found.
+2025-01-23 23:08:52 - ERROR - Authentication failed for librarian 'aaaa123': Incorrect password.
+2025-01-23 23:08:52 - ERROR - Error authenticating librarian 'aaaa123': Incorrect password.
+2025-01-23 23:15:20 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:15:36 - ERROR - Authentication failed for librarian 'aaaa123': Incorrect password.
+2025-01-23 23:15:36 - ERROR - Error authenticating librarian 'aaaa123': Incorrect password.
+2025-01-23 23:17:43 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:17:51 - ERROR - Authentication failed for librarian 'aaaa123': Incorrect password.
+2025-01-23 23:17:51 - ERROR - Error authenticating librarian 'aaaa123': Incorrect password.
+2025-01-23 23:21:05 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:21:14 - ERROR - Password must be at least 6 characters long.
+2025-01-23 23:21:49 - INFO - Librarian 'sapirb' registered successfully.
+2025-01-23 23:21:49 - INFO - User 'sapirb' registered successfully.
+2025-01-23 23:23:09 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-23 23:23:09 - INFO - User 'sapirb' logged in successfully.
+2025-01-23 23:23:48 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:23:56 - ERROR - Authentication failed for librarian 'aaaa123': Incorrect password.
+2025-01-23 23:23:56 - ERROR - Error authenticating librarian 'aaaa123': Incorrect password.
+2025-01-23 23:24:04 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-23 23:24:04 - INFO - User 'sapirb' logged in successfully.
+2025-01-23 23:24:08 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:24:24 - ERROR - Password must be at least 6 characters long.
+2025-01-23 23:24:24 - ERROR - Registration failed for user 'aliza': Invalid username or password
+2025-01-23 23:24:41 - INFO - Librarian 'alizal' registered successfully.
+2025-01-23 23:24:41 - INFO - User 'alizal' registered successfully.
+2025-01-23 23:24:50 - ERROR - Authentication failed for librarian 'alizal': Incorrect password.
+2025-01-23 23:24:50 - ERROR - Error authenticating librarian 'alizal': Incorrect password.
+2025-01-23 23:25:00 - INFO - Authentication successful for librarian 'alizal'.
+2025-01-23 23:25:00 - INFO - User 'alizal' logged in successfully.
+2025-01-23 23:26:39 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:26:46 - INFO - Authentication successful for librarian 'alizal'.
+2025-01-23 23:26:46 - INFO - User 'alizal' logged in successfully.
+2025-01-23 23:28:17 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:28:25 - ERROR - Authentication failed for librarian 'aliza': Username not found.
+2025-01-23 23:28:25 - ERROR - Error authenticating librarian 'aliza': Username not found.
+2025-01-23 23:28:37 - ERROR - Registration failed: Username 'alizal' already exists.
+2025-01-23 23:28:37 - ERROR - Registration failed for user 'alizal': Username already exists
+2025-01-23 23:28:42 - INFO - Librarian 'alizala' registered successfully.
+2025-01-23 23:28:42 - INFO - User 'alizala' registered successfully.
+2025-01-23 23:30:49 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:30:57 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-23 23:30:57 - INFO - User 'sapirb' logged in successfully.
+2025-01-23 23:34:37 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:34:44 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-23 23:34:44 - INFO - User 'sapirb' logged in successfully.
+2025-01-23 23:41:56 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:42:03 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-23 23:42:03 - INFO - User 'sapirb' logged in successfully.
+2025-01-23 23:44:21 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:44:28 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-23 23:44:28 - INFO - User 'sapirb' logged in successfully.
+2025-01-23 23:45:11 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:45:21 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-23 23:45:21 - INFO - User 'sapirb' logged in successfully.
+2025-01-23 23:45:46 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:45:53 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-23 23:45:53 - INFO - User 'sapirb' logged in successfully.
+2025-01-23 23:47:21 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:47:27 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-23 23:47:27 - INFO - User 'sapirb' logged in successfully.
+2025-01-23 23:48:12 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:48:17 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-23 23:48:17 - INFO - User 'sapirb' logged in successfully.
+2025-01-23 23:48:35 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:48:42 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-23 23:48:42 - INFO - User 'sapirb' logged in successfully.
+2025-01-23 23:50:33 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:50:38 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-23 23:50:38 - INFO - User 'sapirb' logged in successfully.
+2025-01-23 23:52:32 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:52:37 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-23 23:52:37 - INFO - User 'sapirb' logged in successfully.
+2025-01-23 23:58:19 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-23 23:58:28 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-23 23:58:28 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 00:00:23 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 00:00:29 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 00:00:29 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 00:03:42 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 00:03:47 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 00:03:47 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 00:04:10 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 00:04:16 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 00:04:16 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 00:04:24 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 00:04:30 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 00:04:30 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 00:11:11 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 00:11:17 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 00:11:17 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 00:11:44 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 00:11:50 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 00:11:50 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 00:12:15 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 00:12:21 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 00:12:21 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 00:13:08 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 00:13:13 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 00:13:13 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 00:14:57 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 00:15:02 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 00:15:02 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 00:16:04 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 00:16:11 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 00:16:11 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 10:45:23 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 10:45:30 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 10:45:30 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 10:50:38 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 10:50:59 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 10:50:59 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 10:51:21 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 10:51:26 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 10:51:26 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 10:51:39 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 10:51:45 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 10:51:45 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 10:54:07 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 10:54:13 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 10:54:13 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 10:56:52 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 10:56:58 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 10:56:58 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 12:37:59 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 12:38:07 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 12:38:07 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 12:39:28 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 12:39:33 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 12:39:33 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 12:40:36 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 12:40:42 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 12:40:42 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 12:41:14 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 12:41:19 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 12:41:19 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 13:44:43 - ERROR - Search 'category' failed for query 'H'. Error: 'category'
+2025-01-24 13:45:14 - ERROR - Search 'name' failed for query 'Moby Dick'. Error: 'category'
+2025-01-24 13:47:36 - INFO - Search 'name' succeeded for query 'hi'. 1 results found.
+2025-01-24 13:48:02 - INFO - Search 'name' succeeded for query 'Thr'. 1 results found.
+2025-01-24 13:48:07 - INFO - Search 'name' succeeded for query 'The'. 16 results found.
+2025-01-24 13:48:19 - ERROR - Search 'genre' failed for query 'F'. Error: 'category'
+2025-01-24 13:48:32 - ERROR - Search 'genre' failed for query 'Fan'. Error: 'category'
+2025-01-24 13:48:41 - ERROR - Search 'genre' failed for query 'Fantasy'. Error: 'category'
+2025-01-24 13:49:36 - INFO - Search 'genre' succeeded for query 'f'. 16 results found.
+2025-01-24 13:49:47 - INFO - Search 'year' completed for query 'f', but no results found.
+2025-01-24 13:49:53 - INFO - Search 'year' succeeded for query '18'. 11 results found.
+2025-01-24 13:50:04 - INFO - Search 'author' completed for query '18', but no results found.
+2025-01-24 13:50:08 - INFO - Search 'author' completed for query 'as', but no results found.
+2025-01-24 14:04:20 - INFO - Search 'genre' succeeded for query 'f'. 16 results found.
+2025-01-24 14:39:05 - INFO - Book 'The Catcher in the Rye' borrowed successfully by user 'Default User'.
+2025-01-24 14:41:06 - ERROR - Borrow book failed for 'The Catcher in the Rye'. Error: eval() arg 1 must be a string, bytes or code object
+2025-01-24 14:41:19 - ERROR - Borrow book failed for 'The Catcher in the Rye'. Error: eval() arg 1 must be a string, bytes or code object
+2025-01-24 14:42:46 - INFO - Book 'The Catcher in the Rye' (Copy ID: 1) borrowed successfully by user 'Default User'.
+2025-01-24 14:51:47 - INFO - Book 'The Catcher in the Rye' (Copy ID: 2) borrowed by user 'dvur', phone: 11111111111, email: aAAA@gmail.vom.
+2025-01-24 14:52:32 - INFO - Book 'The Great Gatsby' (Copy ID: 1) borrowed by user 'ach', phone: 111111111111111, email: asa@gma.com.
+2025-01-24 14:53:22 - INFO - Book 'The Great Gatsby' (Copy ID: 2) borrowed by user 'aaa', phone: 11111111111111, email: saaaaaa@gnng.mm.
+2025-01-24 14:54:24 - INFO - Book 'The Catcher in the Rye' (Copy ID: 1) borrowed by user 'aaaaaa', phone: 111111111, email: a@FDBHGF.,N.
+2025-01-24 14:54:48 - INFO - Book 'The Catcher in the Rye' (Copy ID: 2) borrowed by user 'SA', phone: 2222222222222, email: SA#@FFGFD.ESR.
