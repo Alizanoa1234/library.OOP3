@@ -19,7 +19,8 @@ logger.setLevel(logging.INFO)
 file_handler = RotatingFileHandler(
     LOG_FILE_PATH,
     maxBytes=5 * 1024 * 1024,  # 5 MB per log file
-    backupCount=3  # Keep up to 3 backup log files
+    backupCount=3,  # Keep up to 3 backup log files
+    encoding = "utf-8"  # Support Hebrew and other non-ASCII characters
 )
 file_formatter = logging.Formatter(
     "%(asctime)s - %(levelname)s - %(message)s",
