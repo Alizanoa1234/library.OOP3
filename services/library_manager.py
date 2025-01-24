@@ -23,6 +23,9 @@ class LibraryManager:
         self.strategy = SearchByName()
         self.file_path = file_path
         self.books = load_books_from_file(self.file_path)
+        if self.books is None:
+            raise ValueError(f"Failed to load books from file: {self.file_path}")
+
         self.decorators = {(book.title, book.author): BookDecorator(book) for book in self.books}
         auth_manager = AuthManager("data/users.csv")
         self.users = auth_manager.users_file

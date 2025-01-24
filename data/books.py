@@ -86,6 +86,10 @@ def load_books_from_file(file_path="books.csv"):
         # Load the CSV into a DataFrame
         books_df = pd.read_csv(file_path)
 
+        if books_df.empty:
+            print(f"Warning: The file '{file_path}' is empty.")
+            return []
+
         # Parse 'is_loaned' values and adjust based on 'copies'
         books_df['is_loaned'] = books_df.apply(
             lambda row: parse_is_loaned(row['is_loaned'], row['copies']),
