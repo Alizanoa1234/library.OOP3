@@ -302,22 +302,66 @@ class BooksGUI:
         """
         Return a borrowed book to the library.
         """
+        # בדיקה אם נבחר ספר בטבלה
         selected_item = self.tree.selection()
         if not selected_item:
             messagebox.showerror("Error", "No book selected!")
+            log_error("Return book failed: No book selected by the user.")
             return
 
-        book_title = self.tree.item(selected_item, "values")[0]
-        book_author = self.tree.item(selected_item, "values")[1]  # Author is in the second column
-
-        books_df = self.manager.get_data()
+        # שליפת פרטי הספר שנבחר
+        book_title = self.tree.item(selected_item, "values")[1]  # כותרת הספר
+        book_author = self.tree.item(selected_item, "values")[2]  # מחבר הספר
 
         try:
-            row_index = books_df.index[books_df["title"] == book_title][0]
-            books_df.at[row_index, "copies"] += 1
-            self.manager.initialize_data(books_df)
-            self.refresh_tree()
+            # קבלת נתוני הספרים
+            books_df = self.manager.get_data()
+            book_row = books_df[(books_df["title"] == book_title) & (books_df["author"] == book_author)]
+            if book_row.empty:
+                messagebox.showerror("Error", f"Book '{book_title}' by {book_author} not found.")
+                log_error(f"Return book failed: Book '{book_title}' not found.")
+                return
+
+            row_index = book_row.index[0]
+
+            # טיפול בעמודת is_loaned (נניח שהיא כבר במבנה מילון)
+            is_loaned_dict = books_df.at[row_index, "is_loaned"]  # הערך כבר במבנה מילון
+            if isinstance(is_loaned_dict, str):
+                is_loaned_dict = eval(is_loaned_dict)  # במקרה של מחרוזת, נבצע eval (בדיקת ביטחון בלבד)
+
+            for copy_id, status in is_loaned_dict.items():
+                if status == "yes":  # מציאת עותק מושאל
+                    is_loaned_dict[copy_id] = "no"  # סימון העותק כפנוי
+                    books_df.at[row_index, "is_loaned"] = is_loaned_dict
+
+                    # עדכון עותקים זמינים
+                    books_df.at[row_index, "available"] += 1
+
+                    # טיפול ברשימת המתנה (אם קיימת)
+                    waiting_list = books_df.at[row_index, "waiting_list"]
+                    if isinstance(waiting_list, str):
+                        waiting_list = eval(waiting_list)  # במקרה של מחרוזת, נבצע eval
+
+                    if waiting_list:
+                        next_user = waiting_list.pop(0)
+                        books_df.at[row_index, "waiting_list"] = waiting_list
+                        messagebox.showinfo("Waiting List",
+                                            f"The book is now available for the next user in the waiting list: {next_user}.")
+                        log_info(f"User {next_user} notified for book '{book_title}'.")
+
+                    # שמירת הנתונים ועדכון תצוגה
+                    self.manager.initialize_data(books_df)
+                    self.refresh_tree()
+                    messagebox.showinfo("Success", f"Book '{book_title}' (Copy ID: {copy_id}) returned successfully!")
+                    log_info(f"Book '{book_title}' returned successfully. Copy ID: {copy_id}.")
+                    return
+
+            # אם אין עותקים מושאלים
+            messagebox.showerror("Error", f"All copies of '{book_title}' are already available.")
+            log_error(f"Return book failed: All copies of '{book_title}' are already available.")
+
         except Exception as e:
+            log_error(f"Return book failed for '{book_title}'. Error: {e}")
             messagebox.showerror("Error", f"Failed to return book: {e}")
 
     def search_books(self):
