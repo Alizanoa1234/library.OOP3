@@ -26,9 +26,9 @@ class SearchByAuthor(SearchStrategy):
         return books_df[books_df["author"].str.contains(criteria, case=False, na=False)]
 
 
-class SearchByCategory(SearchStrategy):
+class SearchByGenre(SearchStrategy):
     def search(self, books_df, criteria):
-        return books_df[books_df["category"].str.contains(criteria, case=False, na=False)]
+        return books_df[books_df["genre"].str.contains(criteria, case=False, na=False)]
 
 
 class SearchByYear(SearchStrategy):

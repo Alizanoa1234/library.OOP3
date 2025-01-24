@@ -39,7 +39,7 @@ class BookIterator:
             title=row['title'],
             author=row['author'],
             year=row['year'],
-            category=row['category'],
+            genre=row['genre'],
             copies=row['copies']
         )
 

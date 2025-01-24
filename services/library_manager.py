@@ -1,7 +1,7 @@
 from data.books import load_books_from_file, save_books_to_file
 from models.book import Book
 from models.book_decorator import BookDecorator
-from models.search_strategy import SearchManager, SearchByName, SearchByAuthor, SearchByCategory, SearchByYear
+from models.search_strategy import SearchManager, SearchByName, SearchByAuthor, SearchByGenre, SearchByYear
 from services.auth_manager import AuthManager
 from services.notification_manager import NotificationManager
 from logs.actions import log_info, log_error
@@ -22,6 +22,8 @@ class LibraryManager:
         """
         self.strategy = SearchByName()
         self.file_path = file_path
+        print(f"Initializing LibraryManager with file: {file_path}")
+
         self.books = load_books_from_file(self.file_path)
         if self.books is None:
             raise ValueError(f"Failed to load books from file: {self.file_path}")

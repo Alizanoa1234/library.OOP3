@@ -1,6 +1,6 @@
 import unittest
 import pandas as pd
-from models.search_strategy import SearchManager, SearchByName, SearchByAuthor, SearchByCategory, SearchByYear
+from models.search_strategy import SearchManager, SearchByName, SearchByAuthor, SearchByGenre, SearchByYear
 
 class TestSearchStrategies(unittest.TestCase):
     def setUp(self):
@@ -35,7 +35,7 @@ class TestSearchStrategies(unittest.TestCase):
         """
         Test searching by category.
         """
-        self.search_manager.set_strategy(SearchByCategory())
+        self.search_manager.set_strategy(SearchByGenre())
         results = self.search_manager.search(self.books_df, "Programming")
         self.assertEqual(len(results), 2)
 

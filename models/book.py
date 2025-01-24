@@ -1,8 +1,8 @@
 class Book:
-    def __init__(self, title, author, category, year, copies, is_loaned_status="no"):
+    def __init__(self, title, author, genre, year, copies, is_loaned_status="no"):
         self.title = title
         self.author = author
-        self.category = category
+        self.genre = genre
         self.year = year
         self.copies = copies
 
@@ -57,7 +57,7 @@ class Book:
         return {
             "title": self.title,
             "author": self.author,
-            "category": self.category,
+            "genre": self.genre,
             "year": self.year,
             "copies": self.copies,
             "borrow_count": self.borrow_count,
@@ -74,7 +74,7 @@ class Book:
         book = cls(
             title=data["title"],
             author=data["author"],
-            category=data["category"],
+            genre=data["genre"],
             year=data["year"],
             copies=data["copies"],
         )
@@ -85,7 +85,7 @@ class Book:
         return book
     def __str__(self):
         return (f"Title: {self.title}, Author: {self.author}, Copies: {self.copies}, "
-                f"Available: {self.available}, Loaned: {self.is_loaned}, Genre: {self.category}, Year: {self.year}")
+                f"Available: {self.available}, Loaned: {self.is_loaned}, Genre: {self.genre}, Year: {self.year}")
 
 #FIXME לבדוק האם הפונקציות קיימות במקומות אחרים- זה לא המקום שלהם
 ##################################################################################

@@ -156,7 +156,7 @@ def row_to_book(row):
             title=row['title'],
             author=row['author'],
             year=int(row['year']),
-            category=row.get('genre', 'Unknown'),  # Map 'genre' to 'category'
+            genre=row.get('genre', 'Unknown'),  # Map 'genre' to 'genre'
             copies=int(row['copies'])
         )
         book.borrow_count = row.get('borrow_count', 0)

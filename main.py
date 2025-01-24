@@ -22,14 +22,12 @@ def main():
     data_manager = DataManager.get_instance()
     books_df = data_manager.get_data()
 
-    print(f"CSV file path: {self.csv_file}")
 
-    #
-    # if books_df is not None and not books_df.empty:
-    #     print("\nLoaded DataFrame:")
-    #     print(books_df)
-    #
-    # save_books_to_file(file_path)
+    if books_df is not None and not books_df.empty:
+        print("\nLoaded DataFrame:")
+        print(books_df)
+
+    save_books_to_file(file_path)
 
     #
     #     # Step 3: Select a book to update
