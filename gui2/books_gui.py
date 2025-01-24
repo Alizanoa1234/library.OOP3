@@ -123,8 +123,10 @@ class BooksGUI:
         def save_new_book():
             title = title_var.get()
             author = author_var.get()
+            genre = genre_var.get()
             year = year_var.get()
             copies = copies_var.get()
+
 
             # בדיקת שדות
             if not (title and author and year and copies):
@@ -178,6 +180,10 @@ class BooksGUI:
         tk.Label(add_window, text="Author").pack()
         author_var = tk.StringVar()
         tk.Entry(add_window, textvariable=author_var).pack()
+
+        tk.Label(add_window, text="genre").pack()
+        genre_var = tk.StringVar()
+        tk.Entry(add_window, textvariable=genre_var).pack()
 
         tk.Label(add_window, text="Year").pack()
         year_var = tk.StringVar()
