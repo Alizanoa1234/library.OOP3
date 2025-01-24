@@ -55,19 +55,32 @@ class BooksGUI:
         # Create the main treeview for displaying books
         self.tree = ttk.Treeview(self.root, columns=(
             "index", "title", "author", "genre", "year", "copies",
-            "is_loaned", "available", "borrow_count", "popularity_score"
+            "is_loaned", "available", "borrow_count", "popularity_score", "waiting_list"
         ), show="headings")
 
-        self.tree.heading("index", text="Index")  # New column for numbering
+        # Set column headers and their widths
+        self.tree.heading("index", text="Index")
+        self.tree.column("index", width=50, anchor="center")  # Small column for index
         self.tree.heading("title", text="Title")
+        self.tree.column("title", width=150)  # Title column width
         self.tree.heading("author", text="Author")
+        self.tree.column("author", width=100)  # Author column width
         self.tree.heading("genre", text="Genre")
+        self.tree.column("genre", width=100)  # Genre column width
         self.tree.heading("year", text="Year")
+        self.tree.column("year", width=80, anchor="center")  # Year column width
         self.tree.heading("copies", text="Copies")
+        self.tree.column("copies", width=80, anchor="center")  # Copies column width
         self.tree.heading("is_loaned", text="Is Loaned")
+        self.tree.column("is_loaned", width=100, anchor="center")  # Is Loaned column width
         self.tree.heading("available", text="Available")
+        self.tree.column("available", width=100, anchor="center")  # Available column width
         self.tree.heading("borrow_count", text="Borrow Count")
+        self.tree.column("borrow_count", width=100, anchor="center")  # Borrow Count column width
         self.tree.heading("popularity_score", text="Popularity Score")
+        self.tree.column("popularity_score", width=120, anchor="center")  # Popularity Score column width
+        self.tree.heading("waiting_list", text="Waiting List")
+        self.tree.column("waiting_list", width=200)  # Waiting List column width
         self.tree.pack(fill=tk.BOTH, expand=True)
 
         # Add buttons for managing books
@@ -106,44 +119,58 @@ class BooksGUI:
         """
         Add a new book to the library.
         """
+
         def save_new_book():
-            # Retrieve input values
             title = title_var.get()
             author = author_var.get()
-            genre = genre_var.get()
             year = year_var.get()
             copies = copies_var.get()
 
-            # Validate inputs
-            if not (title and author and genre and year and copies):
+            # בדיקת שדות
+            if not (title and author and year and copies):
                 messagebox.showerror("Error", "All fields are required!")
                 return
 
             try:
-                # Add the new book to DataManager
+                # יצירת מילון עבור is_loaned
+                is_loaned_dict = {i + 1: "no" for i in range(int(copies))}
+
+                # אתחול יתר השדות בערכים מתאימים כברירת מחדל
+                genre = "Uncategorized"  # קטגוריה כללית כברירת מחדל
+                waiting_list = "[]"  # רשימת המתנה ריקה
+                borrow_count = 0  # הספר עדיין לא הושאל
+                popularity_score = 0  # ניקוד פופולריות ראשוני
+
+                # הוספת הספר החדש ל-DataFrame
                 new_row = pd.DataFrame([{
                     "title": title,
                     "author": author,
                     "genre": genre,
                     "year": int(year),
                     "copies": int(copies),
-                    "is_loaned": "No"
+                    "is_loaned": str(is_loaned_dict),  # מילון המייצג את מצב ההשאלה
+                    "available": int(copies),  # כל העותקים זמינים בהתחלה
+                    "borrow_count": borrow_count,  # הספר עדיין לא הושאל
+                    "popularity_score": popularity_score,  # ניקוד פופולריות ראשוני
+                    "waiting_list": waiting_list  # רשימת המתנה ריקה
                 }])
+
                 books_df = self.manager.get_data()
                 books_df = pd.concat([books_df, new_row], ignore_index=True)
                 self.manager.initialize_data(books_df)
-
-                # Refresh the treeview and close the add book window
                 self.refresh_tree()
                 add_window.destroy()
+                messagebox.showinfo("Success", "Book added successfully!")
+                log_info(f"Book '{title}' added successfully.")
+
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to add book: {e}")
+                log_error(f"Failed to add book '{title}'. Error: {e}")
 
-        # Create a new window for adding a book
+        # חלון להוספת ספר חדש
         add_window = tk.Toplevel(self.root)
         add_window.title("Add Book")
 
-        # Input fields for book details
         tk.Label(add_window, text="Title").pack()
         title_var = tk.StringVar()
         tk.Entry(add_window, textvariable=title_var).pack()
@@ -151,10 +178,6 @@ class BooksGUI:
         tk.Label(add_window, text="Author").pack()
         author_var = tk.StringVar()
         tk.Entry(add_window, textvariable=author_var).pack()
-
-        tk.Label(add_window, text="genre").pack()
-        genre_var = tk.StringVar()
-        tk.Entry(add_window, textvariable=genre_var).pack()
 
         tk.Label(add_window, text="Year").pack()
         year_var = tk.StringVar()
@@ -164,25 +187,24 @@ class BooksGUI:
         copies_var = tk.StringVar()
         tk.Entry(add_window, textvariable=copies_var).pack()
 
-        # Save button
         tk.Button(add_window, text="Save", command=save_new_book).pack()
 
     def borrow_book(self):
         """
         Borrow a book from the library using LibraryManager logic and user details.
         """
-        # בדיקה אם נבחר ספר בטבלה
+        # Check if a book is selected in the TreeView
         selected_item = self.tree.selection()
         if not selected_item:
             messagebox.showerror("Error", "No book selected!")
             log_error("Borrow book failed: No book selected by the user.")
             return
 
-        # שליפת פרטי הספר שנבחר
-        book_title = self.tree.item(selected_item, "values")[1]  # כותרת הספר מהטבלה
-        book_author = self.tree.item(selected_item, "values")[2]  # שם המחבר מהטבלה
+        # Retrieve the selected book's title and author
+        book_title = self.tree.item(selected_item, "values")[1]
+        book_author = self.tree.item(selected_item, "values")[2]
 
-        # יצירת חלון להזנת פרטי משתמש
+        # Create a user details input window
         user_window = tk.Toplevel(self.root)
         user_window.title("User Details for Borrowing")
 
@@ -206,7 +228,7 @@ class BooksGUI:
             phone = phone_var.get().strip()
             email = email_var.get().strip()
 
-            # בדיקות תקינות
+            # Validate input fields
             if not name or not phone or not email:
                 messagebox.showerror("Error", "All fields are required!")
                 return
@@ -220,7 +242,7 @@ class BooksGUI:
                 messagebox.showerror("Error", "Invalid email address format.")
                 return
 
-            # אם כל השדות תקינים, מבצעים את ההשאלה
+            # Proceed with borrowing logic if all inputs are valid
             try:
                 books_df = self.manager.get_data()
                 book_row = books_df[(books_df["title"] == book_title) & (books_df["author"] == book_author)]
@@ -230,12 +252,22 @@ class BooksGUI:
                     return
 
                 row_index = book_row.index[0]
-                is_loaned_value = books_df.at[row_index, "is_loaned"]
-                if isinstance(is_loaned_value, str):
-                    is_loaned_dict = eval(is_loaned_value)
-                else:
-                    is_loaned_dict = is_loaned_value
 
+                # Check if there are available copies
+                if books_df.at[row_index, "available"] <= 0:
+                    messagebox.showinfo("Waiting List",
+                                        f"No copies available for '{book_title}'. You have been added to the waiting list.")
+                    waiting_list = eval(books_df.at[row_index, "waiting_list"])
+                    waiting_list.append({"name": name, "phone": phone, "email": email})
+                    books_df.at[row_index, "waiting_list"] = str(waiting_list)
+                    self.manager.initialize_data(books_df)
+                    self.refresh_tree()
+                    log_info(f"User '{name}' added to waiting list for book '{book_title}'.")
+                    user_window.destroy()
+                    return
+
+                # Update available copies and borrow the book
+                is_loaned_dict = eval(books_df.at[row_index, "is_loaned"])
                 for copy_id, status in is_loaned_dict.items():
                     if status == "no":
                         is_loaned_dict[copy_id] = "yes"
@@ -252,23 +284,11 @@ class BooksGUI:
                         user_window.destroy()
                         return
 
-                # אם אין עותקים זמינים, הוספה לרשימת המתנה
-                waiting_list = eval(books_df.at[row_index, "waiting_list"])
-                waiting_list.append({"name": name, "phone": phone, "email": email})
-                books_df.at[row_index, "waiting_list"] = str(waiting_list)
-                self.manager.initialize_data(books_df)
-                self.refresh_tree()
-                messagebox.showinfo("Waiting List",
-                                    f"No copies available for '{book_title}'. You have been added to the waiting list.")
-                log_info(
-                    f"User '{name}' (phone: {phone}, email: {email}) added to the waiting list for book '{book_title}'.")
-                user_window.destroy()
-
             except Exception as e:
                 log_error(f"Borrow book failed for '{book_title}'. Error: {e}")
                 messagebox.showerror("Error", f"Failed to borrow book: {e}")
 
-        # כפתור להשלמת תהליך ההשאלה
+        # Add buttons for validation and cancel
         tk.Button(user_window, text="Borrow", command=validate_and_borrow).pack(pady=10)
         tk.Button(user_window, text="Cancel", command=user_window.destroy).pack(pady=5)
 

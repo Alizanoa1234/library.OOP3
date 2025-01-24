@@ -207,3 +207,16 @@
 2025-01-24 14:53:22 - INFO - Book 'The Great Gatsby' (Copy ID: 2) borrowed by user 'aaa', phone: 11111111111111, email: saaaaaa@gnng.mm.
 2025-01-24 14:54:24 - INFO - Book 'The Catcher in the Rye' (Copy ID: 1) borrowed by user 'aaaaaa', phone: 111111111, email: a@FDBHGF.,N.
 2025-01-24 14:54:48 - INFO - Book 'The Catcher in the Rye' (Copy ID: 2) borrowed by user 'SA', phone: 2222222222222, email: SA#@FFGFD.ESR.
+2025-01-24 15:05:48 - ERROR - Borrow book failed: No book selected by the user.
+2025-01-24 15:06:04 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 15:06:23 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 15:06:23 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 15:08:00 - INFO - Book 'The Catcher in the Rye' (Copy ID: 3) borrowed by user 'avish', phone: 11111111111111, email: sasas@ffd.fds.
+2025-01-24 15:10:55 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 15:11:05 - INFO - Authentication successful for librarian 'sapirb'.
+2025-01-24 15:11:05 - INFO - User 'sapirb' logged in successfully.
+2025-01-24 15:12:22 - INFO - Users file 'C:\Users\sapir\PycharmProjects\library.OOP3\services\..\data/users.csv' loaded successfully.
+2025-01-24 15:13:51 - ERROR - Borrow book failed for 'The Catcher in the Rye'. Error: eval() arg 1 must be a string, bytes or code object
+2025-01-24 15:13:59 - ERROR - Borrow book failed for 'The Great Gatsby'. Error: eval() arg 1 must be a string, bytes or code object
+2025-01-24 15:20:48 - INFO - Book 'as' added successfully.
+2025-01-24 15:21:47 - INFO - Book 'The Odyssey' added successfully.
